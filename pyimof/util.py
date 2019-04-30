@@ -75,8 +75,8 @@ def get_pyramid(I0, I1, downscale=2, min_size=16):
     size = min(I0.shape[:2])
 
     while size > min_size:
-        J0 = pyramid_reduce(pyramid[-1][0], downscale)
-        J1 = pyramid_reduce(pyramid[-1][1], downscale)
+        J0 = pyramid_reduce(pyramid[-1][0], downscale, multichannel=False)
+        J1 = pyramid_reduce(pyramid[-1][1], downscale, multichannel=False)
         pyramid.append((J0, J1))
         size = min(J0.shape[:2])
 
