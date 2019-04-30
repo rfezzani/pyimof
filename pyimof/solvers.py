@@ -4,43 +4,13 @@
 
 from functools import partial
 import numpy as np
-from .util import warp, coarse_to_fine
-
-
-def forward_diff(p):
-    """Forward difference scheme
-
-    """
-    p_x = p.copy()
-    p_x[:, :-1] -= p[:, 1:]
-    p_x[:, -1] = p_x[:, -2]
-
-    p_y = p.copy()
-    p_y[:-1, :] -= p[1:, :]
-    p_y[-1, :] = p_y[-2, :]
-
-    return p_x, p_y
-
-
-def div(p1, p2):
-    """Divergence of P=(p1, p2) using backward differece scheme.
-
-    """
-    p1_x = p1.copy()
-    p1_x[:, 1:] -= p1[:, :-1]
-    p1_x[:, 0] = p1_x[:, 1]
-
-    p2_y = p2.copy()
-    p2_y[1:, :] -= p2[:-1, :]
-    p2_y[0, :] = p2_y[1, :]
-
-    return p1_x + p2_y
+from .util import warp, coarse_to_fine, forward_diff, div
 
 
 def _tvl1(I0, I1, u0, v0, dt=0.1, lambda_=10, tau=10, nwarp=5, niter=100):
 
     nl, nc = I0.shape
-    y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
+    x, y = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
 
     u = u0.copy()
     v = v0.copy()
