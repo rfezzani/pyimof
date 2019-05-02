@@ -142,12 +142,33 @@ def flow_to_mdlburry_color(u, v, thresh=1e9, maxflow=None):
     """Color code the vector field (u, v).
 
     """
+
+    # Preprocess flow
+    nanIdx = np.logical_or(np.isnan(u), np.isnan(v))
+    u[nanIdx] = 0
+    v[nanIdx] = 0
+
+    idx = np.logical_or(abs(u) > thresh, abs(v) > thresh)
+    u[idx] = 0
+    v[idx] = 0
+
+    N = np.sqrt(u*u + v*v)
+    maxN = N.max()
+
+    if (maxflow is not None) and (maxflow > 0):
+        maxN = maxflow
+
+    maxN += 1e-12
+
+    u /= maxN
+    v /= maxN
+
     # generate colors
 
-    col_range = [15, 6, 4, 11, 13, 6]
-    ncol = np.cumsum(col_range)
+    col_range = [0, 15, 6, 4, 11, 13, 6]
+    ncol = np.sum(col_range)
 
-    RY, YG, GC, CB, BM, MR = col_range
+    _, RY, YG, GC, CB, BM, MR = col_range
 
     colorWheel = np.zeros((ncol, 3))
     col = 0
@@ -175,28 +196,27 @@ def flow_to_mdlburry_color(u, v, thresh=1e9, maxflow=None):
     colorWheel[col:col+MR, 2] = 255 - np.floor(255*np.arange(MR)/MR)
     colorWheel[col:col+MR, 0] = 255
 
-    # Preprocess flow
-    np.nan_to_num(u)
-    np.nan_to_num(v)
-    idx = np.logical_or(abs(u) > thresh, abs(v) > thresh)
-    u[idx] = 0
-    v[idx] = 0
-    N = np.sqrt(u*u + v*v)
-    maxN = N.max()
-
     a = np.arctan2(-v, -u)/np.pi
+    fk = (a+1)/2 *(ncol-1)
 
-    if (maxflow is not None) and (maxflow > 0):
-        maxN = maxflow
+    k0 = np.int32(fk)
+    k1 = k0+1
+    k1[k1 == ncol] = 0
 
-    maxN += 1e-12
+    f = fk-k0
 
-    u /= maxN
-    v /= maxN
-    N /= maxN
+    idx = N <= 1
 
-    hsv = np.concatenate([np.atleast_3d(v),
-                          np.atleast_3d(u),
-                          np.atleast_3d(N)], -1)
+    nl, nc = u.shape
+    img = np.empty((nl, nc, 3), dtype=np.uint8)
+    for i in range(3):
+        tmp = colorWheel[:, i]
+        col0 = tmp[k0]/255
+        col1 = tmp[k1]/255
+        col = (1-f)*col0 + f*col1
+        col[idx] = 1-N[idx]*(1-col[idx])
 
-    return hsv2rgb(hsv)
+        col[~idx] *= 0.75
+        img[..., i] = np.uint8(255*col*(1-nanIdx))
+
+    return img/255
