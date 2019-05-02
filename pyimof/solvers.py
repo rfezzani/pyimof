@@ -7,15 +7,16 @@ import numpy as np
 from .util import warp, coarse_to_fine, forward_diff, div
 
 
-def _tvl1(I0, I1, u0, v0, dt=0.1, lambda_=10, tau=10, nwarp=5, niter=100):
+def _tvl1(I0, I1, u0, v0, dt=0.1, lambda_=50, tau=10, nwarp=5, niter=100):
 
     nl, nc = I0.shape
-    x, y = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
+    y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
 
     u = u0.copy()
     v = v0.copy()
 
-    f = lambda_*tau
+    f0 = lambda_*tau
+    f1 = -dt/tau
 
     pu1 = np.zeros_like(u0)
     pu2 = np.zeros_like(u0)
@@ -28,48 +29,56 @@ def _tvl1(I0, I1, u0, v0, dt=0.1, lambda_=10, tau=10, nwarp=5, niter=100):
     for _ in range(nwarp):
         wI1 = warp(I1, u0, v0, x, y)
         Iy, Ix = np.gradient(wI1)
-        NI = Ix*Ix + Iy*Iy
+        NI = Ix*Ix + Iy*Iy + 1e-12
+
+        rho_0 = wI1 - u0 * Ix - v0 * Iy - I0
 
         for __ in range(niter):
 
             # Data term
 
-            rho = wI1 + (u - u0) * Ix + (v - v0) * Iy - I0
+            rho = rho_0 + u*Ix + v*Iy
 
-            idx = abs(rho) <= NI
+            u_ = u.copy()
+            v_ = v.copy()
 
-            u_[idx] = -rho[idx]*Ix[idx]/NI[idx]
-            v_[idx] = -rho[idx]*Iy[idx]/NI[idx]
+            idx = abs(rho) <= f0*NI
+
+            u_[idx] -= rho[idx]*Ix[idx]/NI[idx]
+            v_[idx] -= rho[idx]*Iy[idx]/NI[idx]
 
             idx = ~idx
-            srho = -f*np.sign(rho[idx])
-            u_[idx] = srho*Ix[idx]
-            v_[idx] = srho*Iy[idx]
+            srho = f0*np.sign(rho[idx])
+            u_[idx] -= srho*Ix[idx]
+            v_[idx] -= srho*Iy[idx]
 
             # Regularization term
 
             u = u_ - tau*div(pu1, pu2)
-            v = v_ - tau*div(pv1, pv2)
-
-            # update dual term pu and pv
 
             ux, uy = forward_diff(u)
-            Nu = 1/(1 + dt/tau*(ux*ux + uy*uy))
+            ux *= f1
+            uy *= f1
+            Q = 1 - np.sqrt(ux*ux + uy*uy)
 
-            pu1 += dt/tau*ux
-            pu1 *= Nu
-            pu2 += dt/tau*uy
-            pu2 *= Nu
+            pu1 += ux
+            pu1 /= Q
+            pu2 += uy
+            pu2 /= Q
+
+            v = v_ - tau*div(pv1, pv2)
 
             vx, vy = forward_diff(v)
-            Nv = 1/(1 + dt/tau*(vx*vx + vy*vy))
+            vx *= f1
+            vy *= f1
+            Q = 1 - np.sqrt(vx*vx + vy*vy)
 
-            pv1 += dt/tau*vx
-            pv1 *= Nv
-            pv2 += dt/tau*vy
-            pv2 *= Nv
+            pv1 += vx
+            pv1 /= Q
+            pv2 += vy
+            pv2 /= Q
 
-        u0, v0 = u, v
+        u0, v0 = u.copy(), v.copy()
 
     return u, v
 
