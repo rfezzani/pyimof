@@ -2,6 +2,7 @@
 
 """
 
+import pylab as P
 import numpy as np
 from scipy import ndimage as ndi
 import skimage
@@ -45,9 +46,9 @@ def warp(I, u, v, x=None, y=None, mode='nearest'):
     """
     if (x is None) or (y is None):
         nl, nc = I.shape
-        y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
+        y, x = np.meshgrid(np.arange(nl)-0.5, np.arange(nc)-0.5, indexing='ij')
 
-    return ndi.map_coordinates(I, [y+v, x+u], order=2, mode=mode)
+    return ndi.map_coordinates(I, [y+v, x+u], order=1, mode=mode)
 
 
 def upscale_flow(u, v, shape):
@@ -58,8 +59,10 @@ def upscale_flow(u, v, shape):
     nl, nc = u.shape
     sy, sx = shape[0]/nl, shape[1]/nc
 
-    u = resize(u, shape, preserve_range=True, anti_aliasing=False)
-    v = resize(v, shape, preserve_range=True, anti_aliasing=False)
+    u = resize(u, shape, order=0, preserve_range=True,
+               anti_aliasing=False)
+    v = resize(v, shape, order=0, preserve_range=True,
+               anti_aliasing=False)
 
     return sx*u, sy*v
 
@@ -101,25 +104,99 @@ def coarse_to_fine(I0, I1, solver, downscale=2.0):
     u, v = solver(pyramid[0][0], pyramid[0][1], u, v)
 
     for J0, J1 in pyramid[1:]:
-        print(u.max(), u.min(), v.max(), v.min())
         u, v = upscale_flow(u, v, J0.shape)
         u, v = solver(J0, J1, u, v)
 
     return u, v
 
 
-def flow_to_color(u, v):
+def flow_to_color(u, v, thresh=1e9, maxflow=None):
     """Color code the vector field (u, v).
 
     """
+    np.nan_to_num(u)
+    np.nan_to_num(v)
+    idx = np.logical_or(abs(u) > thresh, abs(v) > thresh)
+    u[idx] = 0
+    v[idx] = 0
     N = np.sqrt(u*u + v*v)
+    maxN = N.max()
 
-    u /= N
-    v /= N
-    N /= N.max()
+    if (maxflow is not None) and (maxflow > 0):
+        maxN = maxflow
 
-    hsv = np.concatenate([np.atleast_3d(u),
-                          np.atleast_3d(v),
+    maxN += 1e-12
+
+    u /= maxN
+    v /= maxN
+    N /= maxN
+
+    hsv = np.concatenate([np.atleast_3d(v),
+                          np.atleast_3d(u),
+                          np.atleast_3d(N)], -1)
+
+    return hsv2rgb(hsv)
+
+
+def flow_to_mdlburry_color(u, v, thresh=1e9, maxflow=None):
+    """Color code the vector field (u, v).
+
+    """
+    # generate colors
+
+    col_range = [15, 6, 4, 11, 13, 6]
+    ncol = np.cumsum(col_range)
+
+    RY, YG, GC, CB, BM, MR = col_range
+
+    colorWheel = np.zeros((ncol, 3))
+    col = 0
+
+    colorWheel[:RY, 0] = 255
+    colorWheel[:RY, 1] = np.floor(255*np.arange(RY)/RY)
+    col += RY
+
+    colorWheel[col:col+YG, 0] = 255 - np.floor(255*np.arange(YG)/YG)
+    colorWheel[col:col+YG, 1] = 255
+    col += YG
+
+    colorWheel[col:col+GC, 1] = 255
+    colorWheel[col:col+GC, 2] = np.floor(255*np.arange(GC)/GC)
+    col += GC
+
+    colorWheel[col:col+CB, 1] = 255 - np.floor(255*np.arange(CB)/CB)
+    colorWheel[col:col+CB, 2] = 255
+    col += CB
+
+    colorWheel[col:col+BM, 2] = 255
+    colorWheel[col:col+BM, 0] = np.floor(255*np.arange(BM)/BM)
+    col += BM
+
+    colorWheel[col:col+MR, 2] = 255 - np.floor(255*np.arange(MR)/MR)
+    colorWheel[col:col+MR, 0] = 255
+
+    # Preprocess flow
+    np.nan_to_num(u)
+    np.nan_to_num(v)
+    idx = np.logical_or(abs(u) > thresh, abs(v) > thresh)
+    u[idx] = 0
+    v[idx] = 0
+    N = np.sqrt(u*u + v*v)
+    maxN = N.max()
+
+    a = np.arctan2(-v, -u)/np.pi
+
+    if (maxflow is not None) and (maxflow > 0):
+        maxN = maxflow
+
+    maxN += 1e-12
+
+    u /= maxN
+    v /= maxN
+    N /= maxN
+
+    hsv = np.concatenate([np.atleast_3d(v),
+                          np.atleast_3d(u),
                           np.atleast_3d(N)], -1)
 
     return hsv2rgb(hsv)
