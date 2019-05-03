@@ -2,22 +2,18 @@
 
 """
 
-import pylab as P
 from functools import partial
 import numpy as np
-from .util import warp, coarse_to_fine, forward_diff, div
+from .util import warp, coarse_to_fine, central_diff, forward_diff, div
 
 
-def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter):
+def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol):
 
     nl, nc = I0.shape
-    y, x = np.meshgrid(np.arange(nl)-0.5, np.arange(nc)-0.5, indexing='ij')
+    y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
 
     f0 = lambda_*tau
     f1 = dt/tau
-
-    # u = np.zeros_like(u0)
-    # v = np.zeros_like(u0)
 
     u = u0.copy()
     v = v0.copy()
@@ -29,14 +25,9 @@ def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter):
 
     for _ in range(nwarp):
         wI1 = warp(I1, u0, v0, x, y)
-        Iy, Ix = np.gradient(wI1)
-        NI = Ix*Ix + Iy*Iy + 1e-12
-
-        # fig = P.figure()
-        # ax1, ax2, ax3 = fig.subplots(1, 3)
-        # ax1.imshow(wI1, cmap='gray')
-        # ax2.imshow(NI)
-        # ax3.imshow(np.sqrt(u0*u0+v0*v0))
+        Ix, Iy = central_diff(wI1)
+        NI = Ix*Ix + Iy*Iy
+        NI[NI == 0] = 1
 
         rho_0 = wI1 - I0 - u0*Ix - v0*Iy
 
@@ -61,41 +52,48 @@ def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter):
 
             # Regularization term
 
-            u = u_ - tau*div(pu1, pu2)
+            for i in range(1):
 
-            ux, uy = forward_diff(u)
-            ux *= f1
-            uy *= f1
-            Q = 1 + np.sqrt(ux*ux + uy*uy)
+                u = u_ - tau*div(pu1, pu2)
 
-            pu1 += ux
-            pu1 /= Q
-            pu2 += uy
-            pu2 /= Q
+                ux, uy = forward_diff(u)
+                ux *= f1
+                uy *= f1
+                Q = 1 + np.sqrt(ux*ux + uy*uy)
 
-            v = v_ - tau*div(pv1, pv2)
+                pu1 += ux
+                pu1 /= Q
+                pu2 += uy
+                pu2 /= Q
 
-            vx, vy = forward_diff(v)
-            vx *= f1
-            vy *= f1
-            Q = 1 + np.sqrt(vx*vx + vy*vy)
+                v = v_ - tau*div(pv1, pv2)
 
-            pv1 += vx
-            pv1 /= Q
-            pv2 += vy
-            pv2 /= Q
+                vx, vy = forward_diff(v)
+                vx *= f1
+                vy *= f1
+                Q = 1 + np.sqrt(vx*vx + vy*vy)
 
-        u0, v0 = u.copy(), v.copy()
+                pv1 += vx
+                pv1 /= Q
+                pv2 += vy
+                pv2 /= Q
 
-    return u0, v0
+        u0 -= u
+        v0 -= v
+        if (u0*u0+v0*v0).sum()/(u.size) < tol:
+            break
+        else:
+            u0, v0 = u.copy(), v.copy()
+
+    return u, v
 
 
-def tvl1(I0, I1, dt=0.15, lambda_=0.05, tau=0.3, nwarp=5, niter=10):
+def tvl1(I0, I1, dt=0.2, lambda_=15, tau=0.3, nwarp=5, niter=10, tol=1e-4):
     """Coarse to fine TV-L1 optical flow estimator.
 
     """
 
     solver = partial(_tvl1, dt=dt, lambda_=lambda_,
-                     tau=tau, nwarp=nwarp, niter=niter)
+                     tau=tau, nwarp=nwarp, niter=niter, tol=tol)
 
     return coarse_to_fine(I0, I1, solver)
