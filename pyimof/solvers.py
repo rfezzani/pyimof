@@ -140,7 +140,7 @@ def _ilk(I0, I1, u0, v0, rad, nwarp):
     return u, v
 
 
-def ilk(I0, I1, rad=5, nwarp=10):
+def ilk(I0, I1, rad=10, nwarp=10):
 
     solver = partial(_ilk, rad=rad, nwarp=nwarp)
 

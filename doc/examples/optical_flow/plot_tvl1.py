@@ -2,15 +2,15 @@ from time import time
 import matplotlib.pyplot as plt
 import pyimof
 
-I0, I1 = pyimof.data.walking
+I0, I1 = pyimof.data.rubberwhale
 
 t0 = time()
-u, v = pyimof.solvers.tvl1(I0, I1)
+u, v = pyimof.solvers.ilk(I0, I1)
 t1 = time()
 
 print("Processing time: {:02f}sec".format(t1-t0))
 
-fig = plt.figure(figsize=((5, 9)))
+fig = plt.figure(figsize=((5, 7)))
 ax1, ax2 = fig.subplots(2, 1)
 
 pyimof.display.quiver(u, v, ax=ax1)
