@@ -4,6 +4,7 @@
 
 from functools import partial
 import numpy as np
+from scipy import ndimage as ndi
 from .util import warp, coarse_to_fine, central_diff, forward_diff, div
 
 
@@ -52,7 +53,7 @@ def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol):
 
             # Regularization term
 
-            for i in range(1):
+            for ___ in range(2):
 
                 u = u_ - tau*div(pu1, pu2)
 
@@ -95,5 +96,52 @@ def tvl1(I0, I1, dt=0.2, lambda_=15, tau=0.3, nwarp=5, niter=10, tol=1e-4):
 
     solver = partial(_tvl1, dt=dt, lambda_=lambda_,
                      tau=tau, nwarp=nwarp, niter=niter, tol=tol)
+
+    return coarse_to_fine(I0, I1, solver)
+
+
+def _ilk(I0, I1, u0, v0, rad, nwarp):
+
+    nl, nc = I0.shape
+    y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
+
+    size = 2*rad+1
+
+    u = u0.copy()
+    v = v0.copy()
+
+    for _ in range(nwarp):
+        wI1 = warp(I1, u, v, x, y)
+        Ix, Iy = central_diff(wI1)
+        It = wI1 - I0 - u*Ix - v*Iy
+
+        J11 = Ix*Ix
+        J12 = Ix*Iy
+        J22 = Iy*Iy
+        J13 = Ix*It
+        J23 = Iy*It
+
+        ndi.uniform_filter(J11, size=size, output=J11, mode='mirror')
+        ndi.uniform_filter(J12, size=size, output=J12, mode='mirror')
+        ndi.uniform_filter(J22, size=size, output=J22, mode='mirror')
+        ndi.uniform_filter(J13, size=size, output=J13, mode='mirror')
+        ndi.uniform_filter(J23, size=size, output=J23, mode='mirror')
+
+        detA = -(J11*J22 - J12*J12)
+        idx = abs(detA) < 1e-14
+        detA[idx] = 1
+
+        u = (J13*J22 - J12*J23)/detA
+        v = (J23*J11 - J12*J13)/detA
+
+        u[idx] = 0
+        v[idx] = 0
+
+    return u, v
+
+
+def ilk(I0, I1, rad=5, nwarp=10):
+
+    solver = partial(_ilk, rad=rad, nwarp=nwarp)
 
     return coarse_to_fine(I0, I1, solver)
