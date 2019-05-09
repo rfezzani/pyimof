@@ -36,7 +36,7 @@ def computeColor(u, v):
     u[nanIdx] = 0.
     v[nanIdx] = 0.
 
-    colorwheel = makeColorwheel()
+    colorwheel = get_color_code()
     ncols = np.size(colorwheel, 0)
     rad = np.sqrt(u**2+v**2)
     a = np.arctan2(-v, -u)/np.pi
@@ -60,7 +60,7 @@ def computeColor(u, v):
     return img/255
 
 
-def makeColorwheel():
+def get_color_code():
     """Color encoding scheme
 
     adapted from the color circle idea described at
@@ -88,37 +88,27 @@ def makeColorwheel():
     return colorWheel
 
 
-def flow_to_middlebury(u, v, maxFlow=0):
-    UNKNOWN_FLOW_THRESH = 1e9
-    eps = np.finfo(float).eps
-
-    maxu = -999
-    maxv = -999
-
-    minu = 999
-    minv = 999
-    maxrad = -1
-
+def flow_to_middlebury(u, v, threshval=1e9, maxrad=None, verbose=True):
     # fix unknown flow
-    idxUnknown = (np.absolute(u) >= UNKNOWN_FLOW_THRESH) + \
-                 (np.absolute(v) >= UNKNOWN_FLOW_THRESH)
+    idxUnknown = np.logical_or((np.absolute(u) >= threshval),
+                               (np.absolute(v) >= threshval))
     u[idxUnknown] = 0.
     v[idxUnknown] = 0.
 
-    maxu = max(maxu, u.max())
-    minu = min(minu, u.min())
+    max_val = 999
 
-    maxv = max(maxv, v.max())
-    minv = min(minv, v.min())
+    maxu = max(-max_val, u.max())
+    minu = min(max_val, u.min())
 
-    rad = np.sqrt(u**2+v**2)
-    maxrad = max(maxrad, rad.max()) + eps
+    maxv = max(-max_val, v.max())
+    minv = min(max_val, v.min())
 
-    print('max flow: %.4f flow range: u = %.3f .. %.3f; v = %.3f .. %.3f' % (
-        maxrad, minu, maxu, minv, maxv))
+    if maxrad is None:
+        maxrad = np.sqrt(u*u + v*v).max()
 
-    if maxFlow > 0:
-        maxrad = maxFlow
+    if verbose:
+        msg = 'max flow: %.4f flow range: u = %.3f .. %.3f; v = %.3f .. %.3f'
+        print(msg % (maxrad, minu, maxu, minv, maxv))
 
     u /= maxrad
     v /= maxrad
@@ -127,9 +117,7 @@ def flow_to_middlebury(u, v, maxFlow=0):
     img = computeColor(u, v)
 
     # unknown flow
-    img[..., 0][idxUnknown] = 0
-    img[..., 1][idxUnknown] = 0
-    img[..., 2][idxUnknown] = 0
+    img[idxUnknown] = 0
 
     return img
 
@@ -245,8 +233,8 @@ def vorticity(u, v, method='leastsq', DeltaX=1., DeltaY=1.):
         outp[:, -2:] = 0.
 
     elif method == 'centered':
-        uy, ux = np.gradient(u)
-        vy, vx = np.gradient(v)
+        uy, _ = np.gradient(u)
+        _, vx = np.gradient(v)
         outp = vx - uy
     else:
         raise ValueError("Unknown method, method must be " +
@@ -259,32 +247,30 @@ def vorticityColorMap():
     """Give a well suited colormap to visualize Vorticity using Pylab.
 
     """
-    cdict = {'red':   [(0.0,  1.0, 1.0),
-                       (0.2,  0.0, 0.0),
-                       (0.4,  0.0, 0.0),
-                       (0.5,  1.0, 1.0),
-                       (0.6,  0.0, 0.0),
-                       (0.7,  0.0, 0.0),
-                       (0.8,  1.0, 1.0),
-                       (1.0,  1.0, 1.0)],
-
-             'green': [(0.0,  0.0, 0.0),
-                       (0.2,  0.0, 0.0),
-                       (0.4,  1.0, 1.0),
-                       (0.5,  1.0, 1.0),
-                       (0.6,  1.0, 1.0),
-                       (0.7,  1.0, 1.0),
-                       (0.8,  1.0, 1.0),
-                       (1.0,  0.0, 0.0)],
-
-             'blue':  [(0.0,  1.0, 1.0),
-                       (0.2,  1.0, 1.0),
-                       (0.4,  1.0, 1.0),
-                       (0.5,  1.0, 1.0),
-                       (0.6,  0.0, 0.0),
-                       (0.7,  0.0, 0.0),
-                       (0.8,  0.0, 0.0),
-                       (1.0,  0.0, 0.0)]}
+    cdict = {'red': [(0.0, 1.0, 1.0),
+                     (0.2, 0.0, 0.0),
+                     (0.4, 0.0, 0.0),
+                     (0.5, 1.0, 1.0),
+                     (0.6, 0.0, 0.0),
+                     (0.7, 0.0, 0.0),
+                     (0.8, 1.0, 1.0),
+                     (1.0, 1.0, 1.0)],
+             'green': [(0.0, 0.0, 0.0),
+                       (0.2, 0.0, 0.0),
+                       (0.4, 1.0, 1.0),
+                       (0.5, 1.0, 1.0),
+                       (0.6, 1.0, 1.0),
+                       (0.7, 1.0, 1.0),
+                       (0.8, 1.0, 1.0),
+                       (1.0, 0.0, 0.0)],
+             'blue': [(0.0, 1.0, 1.0),
+                      (0.2, 1.0, 1.0),
+                      (0.4, 1.0, 1.0),
+                      (0.5, 1.0, 1.0),
+                      (0.6, 0.0, 0.0),
+                      (0.7, 0.0, 0.0),
+                      (0.8, 0.0, 0.0),
+                      (1.0, 0.0, 0.0)]}
 
     return plt.cm.colors.LinearSegmentedColormap('vort_cm', cdict)
 
@@ -300,7 +286,7 @@ def figSize(nl, nc, dimBound=6):
     return w, h
 
 
-def quiver(u, v, ax=None, sstep=None):
+def quiver(u, v, img=None, ax=None, sstep=None):
     nl, nc = u.shape
 
     if ax is None:
@@ -313,76 +299,21 @@ def quiver(u, v, ax=None, sstep=None):
         sstep = max(nl//50, nc//50)
 
     norm = np.sqrt(u**2+v**2)
+    img_cm = 'gray'
+    vec_cm = 'jet'
+    if img is None:
+        img = norm
+        img_cm = 'viridis'
+        vec_cm = 'Greys'
 
-    b = 25
-    a = np.minimum(nc % b, nl % b)
-    xmin = a-b
-    xmax = nc - xmin
-    ymin = a-b
-    ymax = nl - ymin
+    ax.imshow(img, cmap=img_cm)
 
-    ax.imshow(norm)
-
-    x, y = np.mgrid[:nl, :nc]
-    ax.quiver(y[::sstep, ::sstep], x[::sstep, ::sstep],
-              u[::sstep, ::sstep], -v[::sstep, ::sstep],
-              units='dots')
-    ax.axis([xmin, xmax, ymax, ymin])
+    y, x = np.mgrid[:nl:sstep, :nc:sstep]
+    u_ = u[::sstep, ::sstep]
+    v_ = v[::sstep, ::sstep]
+    idx = np.logical_and(np.logical_and(x+u_ >= 0, x+u_ <= nc-1),
+                         np.logical_and(y+v_ >= 0, y+v_ <= nl-1))
+    norm = norm[::sstep, ::sstep]
+    ax.quiver(x[idx], y[idx], u_[idx], v_[idx], norm[idx], units='dots',
+              angles='xy', scale_units='xy', cmap=vec_cm)
     ax.set_axis_off()
-
-
-def colorCodeShow(u, v, figsize=None):
-    if figsize is None:
-        nl, nc = u.shape
-        figsize = figSize(nl, nc, 6)
-    flow = np.zeros((nl, nc, 2))
-    flow[..., 0] = u
-    flow[..., 1] = v
-    img = flow_to_color(flow)
-    plt.figure(figsize=figsize)
-    ax = plt.axes([0, 0, 1, 1], frameon=False)
-    ax.set_axis_off()
-    plt.imshow(img)
-
-
-def normShow(u, v, figsize=None):
-    if figsize is None:
-        nl, nc = u.shape
-        figsize = figSize(nl, nc, 6)
-    norm = np.sqrt(u**2+v**2)
-    plt.figure(figsize=figsize)
-    ax = plt.axes([0, 0, 1, 1], frameon=False)
-    ax.set_axis_off()
-    plt.imshow(norm)
-
-
-def vortShow(u, v, method='centered', tresh=0.4, norm=None, figsize=None):
-    vort = vorticity(u, v, method, DeltaX=1., DeltaY=1.)
-    if norm is None:
-        norm = np.sqrt(u**2+v**2)
-    if figsize is None:
-        nl, nc = u.shape
-        figsize = figSize(nl, nc, 6)
-    vort[norm < tresh] = 0.
-    cm = vorticityColorMap()
-
-    plt.figure(figsize=figsize)
-    ax = plt.axes([0, 0, 1, 1], frameon=False)
-    ax.set_axis_off()
-    plt.imshow(vort, cmap=cm, vmin=-0.2, vmax=0.2)
-
-
-def pctileTreshold(u, v, pctil=99):
-
-    nl, nc = u.shape
-    norm = np.sqrt(u**2+v**2)
-
-    if (100. - pctil):
-        max_norm = np.sort(norm, axis=None)[np.floor(nl*nc*pctil/100)]
-        idx = np.where(norm > max_norm)
-        u[idx] /= norm[idx]
-        u[idx] *= max_norm
-        v[idx] /= norm[idx]
-        v[idx] *= max_norm
-
-    return u, v
