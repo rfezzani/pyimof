@@ -1,6 +1,30 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import ndimage
+import skimage
+
+
+def flow_to_color(u, v):
+    nl, nc = u.shape
+
+    flow = np.empty_like(u, dtype=np.complex)
+    flow.real = u
+    flow.imag = v
+    magnitude, angle = np.absolute(flow), np.angle(flow)
+
+    # Map the magnitude between 0 and 1
+    magnitude -= magnitude.min()
+    magnitude /= magnitude.max()
+
+    # Set hue according to flow direction
+    angle *= 0.5/np.pi
+
+    # Create the corresponding HSV image
+    img = np.ones((nl, nc, 3))
+    img[..., 0] = angle
+    img[..., 2] = magnitude
+
+    return skimage.color.hsv2rgb(img)
 
 
 def computeColor(u, v):
@@ -64,7 +88,7 @@ def makeColorwheel():
     return colorWheel
 
 
-def flow_to_color(u, v, maxFlow=0):
+def flow_to_middlebury(u, v, maxFlow=0):
     UNKNOWN_FLOW_THRESH = 1e9
     eps = np.finfo(float).eps
 
