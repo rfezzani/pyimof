@@ -53,7 +53,7 @@ def div(p1, p2):
     return p1_x + p2_y
 
 
-def warp(I, u, v, x=None, y=None, mode='nearest', prefilter=True):
+def warp(I, u, v, x=None, y=None, prefilter=True, mode='nearest'):
     """Image warping using the motion field (u, v)
 
     """

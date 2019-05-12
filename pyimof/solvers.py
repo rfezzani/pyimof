@@ -8,7 +8,7 @@ from scipy import ndimage as ndi
 from .util import warp, coarse_to_fine, central_diff, forward_diff, div
 
 
-def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol):
+def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
 
     nl, nc = I0.shape
     y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
@@ -25,7 +25,7 @@ def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol):
     pv2 = np.zeros_like(u0)
 
     for _ in range(nwarp):
-        wI1 = warp(I1, u0, v0, x, y)
+        wI1 = warp(I1, u0, v0, x, y, prefilter)
         Ix, Iy = central_diff(wI1)
         NI = Ix*Ix + Iy*Iy
         NI[NI == 0] = 1
@@ -89,18 +89,20 @@ def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol):
     return u, v
 
 
-def tvl1(I0, I1, dt=0.2, lambda_=15, tau=0.3, nwarp=5, niter=10, tol=1e-4):
+def tvl1(I0, I1, dt=0.2, lambda_=15, tau=0.3, nwarp=5, niter=10,
+         tol=1e-4, prefilter=False):
     """Coarse to fine TV-L1 optical flow estimator.
 
     """
 
-    solver = partial(_tvl1, dt=dt, lambda_=lambda_,
-                     tau=tau, nwarp=nwarp, niter=niter, tol=tol)
+    solver = partial(_tvl1, dt=dt, lambda_=lambda_, tau=tau,
+                     nwarp=nwarp, niter=niter, tol=tol,
+                     prefilter=prefilter)
 
     return coarse_to_fine(I0, I1, solver)
 
 
-def _ilk(I0, I1, u0, v0, rad, nwarp):
+def _ilk(I0, I1, u0, v0, rad, nwarp, prefilter):
 
     nl, nc = I0.shape
     y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
@@ -111,7 +113,7 @@ def _ilk(I0, I1, u0, v0, rad, nwarp):
     v = v0.copy()
 
     for _ in range(nwarp):
-        wI1 = warp(I1, u, v, x, y)
+        wI1 = warp(I1, u, v, x, y, prefilter)
         Ix, Iy = central_diff(wI1)
         It = wI1 - I0 - u*Ix - v*Iy
 
@@ -140,8 +142,8 @@ def _ilk(I0, I1, u0, v0, rad, nwarp):
     return u, v
 
 
-def ilk(I0, I1, rad=7, nwarp=10):
+def ilk(I0, I1, rad=7, nwarp=10, prefilter=False):
 
-    solver = partial(_ilk, rad=rad, nwarp=nwarp)
+    solver = partial(_ilk, rad=rad, nwarp=nwarp, prefilter=prefilter)
 
     return coarse_to_fine(I0, I1, solver)

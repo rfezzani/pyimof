@@ -6,7 +6,7 @@ fig = plt.figure(figsize=((8, 7)))
 ax1, ax2, ax3, ax4 = fig.subplots(2, 2).ravel()
 plt.tight_layout()
 
-I0, I1 = pyimof.data.rubberwhale
+I0, I1 = pyimof.data.yosemite
 
 t0 = time()
 u, v = pyimof.solvers.tvl1(I0, I1)
