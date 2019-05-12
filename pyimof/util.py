@@ -53,7 +53,7 @@ def div(p1, p2):
     return p1_x + p2_y
 
 
-def warp(I, u, v, x=None, y=None, mode='nearest'):
+def warp(I, u, v, x=None, y=None, mode='nearest', prefilter=True):
     """Image warping using the motion field (u, v)
 
     """
@@ -61,7 +61,14 @@ def warp(I, u, v, x=None, y=None, mode='nearest'):
         nl, nc = I.shape
         y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
 
-    return ndi.map_coordinates(I, [y+v, x+u], order=2, mode=mode)
+    if prefilter:
+        u_ = ndi.filters.median_filter(u, 3)
+        v_ = ndi.filters.median_filter(v, 3)
+    else:
+        u_ = u
+        v_ = v
+
+    return ndi.map_coordinates(I, [y+v_, x+u_], order=2, mode=mode)
 
 
 def upscale_flow(u, v, shape):
