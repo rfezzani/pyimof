@@ -8,4 +8,9 @@ from . import display
 plt.cm.register_cmap(
     'middlebury',
     cmap=plt.cm.colors.LinearSegmentedColormap.from_list(
-        'middlebury', display._get_color_code()))
+        'middlebury', display._get_color_code()).reversed())
+
+plt.cm.register_cmap(
+    'middlebury_r',
+    cmap=plt.cm.colors.LinearSegmentedColormap.from_list(
+        'middlebury_r', display._get_color_code()))
