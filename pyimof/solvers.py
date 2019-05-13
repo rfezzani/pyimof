@@ -9,6 +9,9 @@ from .util import warp, coarse_to_fine, central_diff, forward_diff, div
 
 
 def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
+    """TV-L1 solver for optical flow estimation.
+
+    """
 
     nl, nc = I0.shape
     y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
@@ -103,6 +106,9 @@ def tvl1(I0, I1, dt=0.2, lambda_=15, tau=0.3, nwarp=5, niter=10,
 
 
 def _ilk(I0, I1, u0, v0, rad, nwarp, prefilter):
+    """Iterative Lucas-Kanade (iLK) solver for optical flow estimation.
+
+    """
 
     nl, nc = I0.shape
     y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
@@ -143,6 +149,9 @@ def _ilk(I0, I1, u0, v0, rad, nwarp, prefilter):
 
 
 def ilk(I0, I1, rad=7, nwarp=10, prefilter=False):
+    """Coarse to fine iLK optical flow estimator.
+
+    """
 
     solver = partial(_ilk, rad=rad, nwarp=nwarp, prefilter=prefilter)
 

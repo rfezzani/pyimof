@@ -41,7 +41,7 @@ def forward_diff(p):
 def div(p1, p2):
     """Divergence of P=(p1, p2) using backward differece scheme.
 
-    # """
+    """
     p1_x = p1.copy()
     p1_x[:, :-1] -= p1[:, 1:]
     # p1_x[:, -1] = 0
