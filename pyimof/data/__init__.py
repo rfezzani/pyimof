@@ -1,46 +1,25 @@
+from functools import partial
 import os
 import imageio
 
 data_path = os.path.abspath(os.path.dirname(__file__))
 
-yosemite = [imageio.imread(os.path.join(data_path, 'Yosemite', f))
-            for f in sorted(os.listdir(os.path.join(data_path, 'Yosemite')))]
 
-beanbags = [imageio.imread(os.path.join(data_path, 'Beanbags', f))
-            for f in sorted(os.listdir(os.path.join(data_path, 'Beanbags')))]
+def load_seq(dirname):
+    return [imageio.imread(os.path.join(data_path, dirname, f))
+            for f in sorted(os.listdir(os.path.join(data_path, dirname)))]
 
-dogdance = [imageio.imread(os.path.join(data_path, 'DogDance', f))
-            for f in sorted(os.listdir(os.path.join(data_path, 'DogDance')))]
 
-grove3 = [imageio.imread(os.path.join(data_path, 'Grove3', f))
-          for f in sorted(os.listdir(os.path.join(data_path, 'Grove3')))]
-
-urban2 = [imageio.imread(os.path.join(data_path, 'Urban2', f))
-          for f in sorted(os.listdir(os.path.join(data_path, 'Urban2')))]
-
-venus = [imageio.imread(os.path.join(data_path, 'Venus', f))
-         for f in sorted(os.listdir(os.path.join(data_path, 'Venus')))]
-
-dimetrodon = [imageio.imread(os.path.join(data_path, 'Dimetrodon', f))
-              for f in sorted(os.listdir(os.path.join(data_path,
-                                                      'Dimetrodon')))]
-
-grove2 = [imageio.imread(os.path.join(data_path, 'Grove2', f))
-          for f in sorted(os.listdir(os.path.join(data_path, 'Grove2')))]
-
-hydrangea = [imageio.imread(os.path.join(data_path, 'Hydrangea', f))
-             for f in sorted(os.listdir(os.path.join(data_path, 'Hydrangea')))]
-
-minicooper = [imageio.imread(os.path.join(data_path, 'MiniCooper', f))
-              for f in sorted(os.listdir(os.path.join(data_path,
-                                                      'MiniCooper')))]
-
-rubberwhale = [imageio.imread(os.path.join(data_path, 'RubberWhale', f))
-               for f in sorted(os.listdir(os.path.join(data_path,
-                                                       'RubberWhale')))]
-
-urban3 = [imageio.imread(os.path.join(data_path, 'Urban3', f))
-          for f in sorted(os.listdir(os.path.join(data_path, 'Urban3')))]
-
-walking = [imageio.imread(os.path.join(data_path, 'Walking', f))
-           for f in sorted(os.listdir(os.path.join(data_path, 'Walking')))]
+beanbags = partial(load_seq, dirname='Beanbags')
+dimetrodon = partial(load_seq, dirname='Dimetrodon')
+dogdance = partial(load_seq, dirname='DogDance')
+grove2 = partial(load_seq, dirname='Grove2')
+grove3 = partial(load_seq, dirname='Grove3')
+hydrangea = partial(load_seq, dirname='Hydrangea')
+minicooper = partial(load_seq, dirname='MiniCooper')
+rubberwhale = partial(load_seq, dirname='RubberWhale')
+urban2 = partial(load_seq, dirname='Urban2')
+urban3 = partial(load_seq, dirname='Urban3')
+venus = partial(load_seq, dirname='Venus')
+walking = partial(load_seq, dirname='Walking')
+yosemite = partial(load_seq, dirname='Yosemite')
