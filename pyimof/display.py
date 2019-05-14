@@ -1,3 +1,4 @@
+# coding: utf-8
 """Collection of utils and functions for the visualization of vector
 fields.
 

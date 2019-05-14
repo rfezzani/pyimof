@@ -1,3 +1,8 @@
+# coding: utf-8
+"""A python package for optical flow estimation.
+
+"""
+
 import matplotlib.pyplot as plt
 from . import data
 from . import io
