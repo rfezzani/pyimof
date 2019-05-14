@@ -1,14 +1,19 @@
+"""Collection of utils and functions for the visualization of vector
+fields.
+
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import ndimage
 import skimage
 
 
-def _get_color_code():
-    """Color encoding scheme
+def _middlebury():
+    """Returns the color code inspired by the middlebury [1]_ evaluation for
+    optical flow algorithms.
 
-    adapted from the color circle idea described at
-    http://members.shaw.ca/quadibloc/other/colint.htm
+    ..[1] http://vision.middlebury.edu/flow/
 
     """
 
@@ -33,6 +38,17 @@ def _get_color_code():
 
 
 def flow_to_color(u, v, cmap=None, scale=True):
+    """Apply color code to a vector field according to its orientation and
+    magnitude.
+
+    Any colormap compatible with matplotlib can be applyed but
+    circuler colormaps are recommanded: huv, twilight,
+    twilight_shifted and the builtin middlebury colormaps.
+
+    If cmap is None, the HSV image defined using optical flow
+    orientation (hue) and magnitude (saturation) is returned.
+
+    """
 
     flow = (u + 1j*v)
     magnitude = np.absolute(flow)
@@ -65,6 +81,10 @@ def flow_to_color(u, v, cmap=None, scale=True):
 
 
 def color_wheel(u, v, nr=50, ntheta=1025):
+    """Returns the coordinates and value of a color wheel used to describe
+    the color code used to display a vector field.
+
+    """
     rad = np.sqrt(u*u + v*v)
     r, t = np.mgrid[:rad.max():nr*1j, np.pi/2:2*np.pi+np.pi/2:ntheta*1j]
     vals = np.mod(t, 2*np.pi)
@@ -72,6 +92,10 @@ def color_wheel(u, v, nr=50, ntheta=1025):
 
 
 def get_tight_figsize(nl, nc, dimBound=6):
+    """Returns the optimal matplotlib figure size respecting image
+    proportions.
+
+    """
     dpi = plt.rcParams['figure.dpi']
     h = float(nl)/dpi
     w = float(nc)/dpi
@@ -83,6 +107,9 @@ def get_tight_figsize(nl, nc, dimBound=6):
 
 
 def plot(u, v, ax=None, cmap='middlebury', colorwheel=True, scale=True):
+    """Plots the color coded vector field.
+
+    """
 
     if ax is None:
         nl, nc = u.shape
@@ -112,6 +139,9 @@ def plot(u, v, ax=None, cmap='middlebury', colorwheel=True, scale=True):
 
 
 def quiver(u, v, img=None, ax=None, sstep=None):
+    """Draws a quiver plot representing a vector field.
+
+    """
     nl, nc = u.shape
 
     if ax is None:

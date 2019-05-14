@@ -5,12 +5,14 @@ from . import solvers
 from . import display
 
 
+# Registration of the middlebury color map
 plt.cm.register_cmap(
     'middlebury',
     cmap=plt.cm.colors.LinearSegmentedColormap.from_list(
-        'middlebury', display._get_color_code()).reversed())
+        'middlebury', display._middlebury()).reversed())
 
+# Registration of reversed version of the middlebury color map
 plt.cm.register_cmap(
     'middlebury_r',
     cmap=plt.cm.colors.LinearSegmentedColormap.from_list(
-        'middlebury_r', display._get_color_code()))
+        'middlebury_r', display._middlebury()))
