@@ -5,15 +5,25 @@ fields.
 
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy import ndimage
 import skimage
 
 
 def _middlebury():
-    """Returns the color code inspired by the middlebury [1]_ evaluation for
-    optical flow algorithms.
+    """Compute the colors used to generate the `middlebury` colormap.
 
-    ..[1] http://vision.middlebury.edu/flow/
+    This colormap is inspired by the middlebury evaluation for optical
+    flow algorithms [1]_. The RGB values are extracted from the matlab
+    code [2]_
+
+    Returns
+    -------
+    cmap : 2D ndarray
+        The colors used to generate the 'middlebury' colormap.
+
+    References
+    ----------
+    .. [1] http://vision.middlebury.edu/flow/
+    .. [2] http://vision.middlebury.edu/flow/code/flow-code-matlab.zip
 
     """
 
@@ -42,11 +52,30 @@ def flow_to_color(u, v, cmap=None, scale=True):
     magnitude.
 
     Any colormap compatible with matplotlib can be applyed but
-    circuler colormaps are recommanded: huv, twilight,
-    twilight_shifted and the builtin middlebury colormaps.
+    circuler colormaps are recommanded: 'huv', 'twilight',
+    'twilight_shifted' and the builtin 'middlebury' colormaps.
 
     If cmap is None, the HSV image defined using optical flow
     orientation (hue) and magnitude (saturation) is returned.
+
+    Parameters
+    ----------
+    u : 2D ndarray
+        The horizontal component of the vector field.
+    v : 2D ndarray
+        The vertical component of the vector field.
+    cmap : str or None
+        The colormap used to color code the input vector field
+        (default: None)
+    scale : bool
+        whether to scale output saturation according to magnitude
+        (default: True).
+
+    Returns
+    -------
+    img : 3D ndarray
+        RGBA image representing the desired color code applyed to the
+        vector field.
 
     """
 
@@ -80,23 +109,60 @@ def flow_to_color(u, v, cmap=None, scale=True):
     return img
 
 
-def color_wheel(u, v, nr=50, ntheta=1025):
-    """Returns the coordinates and value of a color wheel used to describe
-    the color code used to display a vector field.
+def color_wheel(u=None, v=None, nr=50, ntheta=1025):
+    """Compute the discretization of a wheel used to describe
+    the color code used to display a vector field (u, v).
+
+    If the vector field (u, v) is provided, the radius of the wheel is
+    equal to its maximum magnitude. Otherwise (i.e. if u and v are
+    None), the radius is set to 1.
+
+    Parameters
+    ----------
+    u : 2D ndarray or None
+        The horizontal component of the vector field (default: None).
+    v : 2D ndarray or None
+        The vertical component of the vector field (default: None).
+    nr : int
+        The number of steps used to discretise the wheel radius.
+    ntheta : int
+        The number of steps used to discretise the wheel sectors.
+
+    Returns
+    -------
+    angle : 2D ndarray
+        The grid discretisation of the wheel sectors.
+    radius : 2D ndarray
+        The grid discretisation of the wheel radius.
 
     """
-    rad = np.sqrt(u*u + v*v)
-    r, t = np.mgrid[:rad.max():nr*1j, np.pi/2:2*np.pi+np.pi/2:ntheta*1j]
-    vals = np.mod(t, 2*np.pi)
-    return t, r, vals
+    max_rad = 1
+    if u is not None and v is not None:
+        max_rad = np.sqrt(u*u + v*v).max()
+    radius, angle = np.mgrid[:max_rad:nr*1j, 0:2*np.pi:ntheta*1j]
+    return angle, radius
 
 
-def get_tight_figsize(nl, nc, dimBound=6):
-    """Returns the optimal matplotlib figure size respecting image
+def get_tight_figsize(I):
+    """Computes the matplotlib figure tight size respecting image
     proportions.
 
+    Parameters
+    ----------
+    I : 2D or 3D ndarray
+        The image to be displayed.
+
+    Returns
+    -------
+    w : float
+        The width in inch of the desired figure.
+    h : float
+        The height in inch of the desired figure.
+
     """
+    nl, nc = I.shape[:2]
     dpi = plt.rcParams['figure.dpi']
+    dimBound = max(plt.rcParams['figure.figsize'])
     h = float(nl)/dpi
     w = float(nc)/dpi
     maxDim = max(h, w)
@@ -106,18 +172,42 @@ def get_tight_figsize(nl, nc, dimBound=6):
     return w, h
 
 
-def plot(u, v, ax=None, cmap='middlebury', colorwheel=True, scale=True):
+def plot(u, v, ax=None, cmap='middlebury', scale=True, colorwheel=True):
     """Plots the color coded vector field.
+
+    Parameters
+    ----------
+    u : 2D ndarray
+        The horizontal component of the vector field.
+    v : 2D ndarray
+        The vertical component of the vector field.
+    ax : Axes
+        Optional matplotlib axes used to plot the image. If None, the
+        image is displayed in a tight figure (default: None).
+    cmap : str or None
+        The colormap used to color code the input vector field
+        (default: 'middlebury')
+    scale : bool
+        whether to scale output saturation according to magnitude
+        (default: True).
+    colorwheel : bool
+        whether to display the color wheel describing the images
+        colors or not (default: True).
+
+    Returns
+    -------
+    ax : Axes
+        The matplotlib axes where the image is displayed.
 
     """
 
+    img = flow_to_color(u, v, cmap, scale)
+
     if ax is None:
         nl, nc = u.shape
-        figsize = get_tight_figsize(nl, nc)
+        figsize = get_tight_figsize(img)
         plt.figure(figsize=figsize, facecolor=(1., 1., 1.))
         ax = plt.axes([0, 0, 1, 1], frameon=False)
-
-    img = flow_to_color(u, v, cmap, scale)
 
     ax.imshow(img)
     ax.set_axis_off()
@@ -133,104 +223,75 @@ def plot(u, v, ax=None, cmap='middlebury', colorwheel=True, scale=True):
 
         fig = ax.get_figure()
         ax2 = fig.add_axes([x0, y0, w*0.2, h*0.2], polar=1)
-        t, r, vals = color_wheel(u, v)
-        ax2.pcolormesh(t, r, vals, cmap=cmap)
+        angle, rad = color_wheel(u, v)
+        ax2.pcolormesh(angle, rad, angle, cmap=cmap)
         ax2.set_xticks([])
 
+    return ax
 
-def quiver(u, v, img=None, ax=None, sstep=None):
+
+def quiver(u, v, c=None, bg=None, ax=None, step=None, nvec=50,
+           vec_cmap=None, bg_cmap=None):
     """Draws a quiver plot representing a vector field.
 
+    Parameters
+    ----------
+    u : 2D ndarray
+        The horizontal component of the vector field.
+    v : 2D ndarray
+        The vertical component of the vector field.
+    c : 2D ndarray
+        Optional array of values used to color the arrows.
+    bg : 2D or 3D ndarray or None
+        An optional background image.
+    ax : Axes
+        Optional matplotlib axes used to plot the image. If None, the
+        image is displayed in a tight figure (default: None).
+    step : int or None
+        The grid step used to display the vector field. If None, it is
+        computed using the nvec parameter (default: None).
+    nvec : int
+        The maximum number of vector over all the grid dimentions. It
+        is ignored if the step parameter is not None (default: 50).
+    vec_cmap : str or None
+        The colormap used to color the arrows (default: None).
+    bg_cmap : str or None
+        The colormap used to color the background image (default: None).
+
+    Returns
+    -------
+    ax : Axes
+        The matplotlib axes where the vector field is displayed.
+
     """
-    nl, nc = u.shape
 
     if ax is None:
-        figsize = get_tight_figsize(nl, nc)
+        figsize = get_tight_figsize(u)
         plt.figure(figsize=figsize, facecolor=(1., 1., 1.))
         ax = plt.axes([0, 0, 1, 1], frameon=False)
         ax.set_axis_off()
 
-    if sstep is None:
-        sstep = max(nl//50, nc//50)
+    nl, nc = u.shape
 
-    norm = np.sqrt(u**2+v**2)
-    img_cm = 'gray'
-    vec_cm = 'jet'
-    if img is None:
-        img = norm
-        img_cm = 'viridis'
-        vec_cm = 'Greys'
+    if step is None:
+        step = max(nl//nvec, nc//nvec)
 
-    ax.imshow(img, cmap=img_cm)
-
-    y, x = np.mgrid[:nl:sstep, :nc:sstep]
-    u_ = u[::sstep, ::sstep]
-    v_ = v[::sstep, ::sstep]
+    y, x = np.mgrid[:nl:step, :nc:step]
+    u_ = u[::step, ::step]
+    v_ = v[::step, ::step]
     idx = np.logical_and(np.logical_and(x+u_ >= 0, x+u_ <= nc-1),
                          np.logical_and(y+v_ >= 0, y+v_ <= nl-1))
-    norm = norm[::sstep, ::sstep]
-    ax.quiver(x[idx], y[idx], u_[idx], v_[idx], norm[idx], units='dots',
-              angles='xy', scale_units='xy', cmap=vec_cm)
+
+    ax.axis([0, nc, nl, 0])
+    if bg is not None:
+        ax.imshow(bg, cmap=bg_cmap)
+
+    args = [x[idx], y[idx], u_[idx], v_[idx]]
+    if c is not None:
+        args.append(c[::step, ::step][idx])
+
+    ax.quiver(*args, units='dots', angles='xy', scale_units='xy',
+              cmap=vec_cmap)
     ax.set_axis_off()
 
-
-def vorticity(u, v, method='leastsq', DeltaX=1., DeltaY=1.):
-    """outp = vorticity(u,v,method='centered',DeltaX=1.,DeltaY=1.)
-
-    compute the vorticity of a 2D flow field (u,v) computed on a
-    uniformly spaced grid.
-
-    u: horizontal componant of the flow
-    v: vertical component of the flow
-    method (default = 'leastsq'): specify the used method
-           should be 'circulation', 'richardson', 'leastsq' or 'centered'.
-    DeltaX, DeltaY: respectively the horizontal an vertical grid step.
-           (Default = 1.)
-
-    """
-
-    if method == 'circulation':
-        Dx = np.array([[-1, 0, 1],
-                       [-2, 0, 2],
-                       [-1, 0, 1]])/(8*DeltaX)
-        Dy = np.array([[1, 2, 1],
-                       [0, 0, 0],
-                       [-1, -2, -1]])/(8*DeltaY)
-        Vort = ndimage.convolve(v, Dx) + ndimage.convolve(u, Dy)
-        outp = -np.real(Vort)
-        outp[0, :] = 0.
-        outp[-1, :] = 0.
-        outp[:, -1] = 0.
-        outp[:, 0] = 0.
-
-    elif method == 'richardson':
-
-        Dx = np.array([-1, 8, 0, -8, 1])/(12*DeltaX)
-        Dy = np.array([-1, 8, 0, -8, 1])/(12*DeltaY)
-        outp = (ndimage.convolve1d(v, Dx, axis=1) -
-                ndimage.convolve1d(u, Dy, axis=0))
-        outp[:2, :] = 0.
-        outp[-2:, :] = 0.
-        outp[:, :2] = 0.
-        outp[:, -2:] = 0.
-
-    elif method == 'leastsq':
-
-        Dx = np.array([2, 1, 0, -1, -2])/(10*DeltaX)
-        Dy = np.array([2, 1, 0, -1, -2])/(10*DeltaY)
-        outp = (ndimage.convolve1d(v, Dx, axis=1) -
-                ndimage.convolve1d(u, Dy, axis=0))
-        outp[:2, :] = 0.
-        outp[-2:, :] = 0.
-        outp[:, :2] = 0.
-        outp[:, -2:] = 0.
-
-    elif method == 'centered':
-        uy, _ = np.gradient(u)
-        _, vx = np.gradient(v)
-        outp = vx - uy
-    else:
-        raise ValueError("Unknown method, method must be " +
-                         "'circulation','richardson','leastsq' or 'centered'")
-
-    return outp
+    return ax

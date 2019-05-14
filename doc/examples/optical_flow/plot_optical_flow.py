@@ -1,11 +1,12 @@
 from time import time
+import numpy as np
 import matplotlib.pyplot as plt
 import pyimof
 
 
 # --- Load data
 
-I0, I1 = pyimof.data.yosemite()
+I0, I1 = pyimof.data.dimetrodon()
 
 fig = plt.figure(figsize=((8, 7)))
 ax1, ax2, ax3, ax4 = fig.subplots(2, 2).ravel()
@@ -18,7 +19,10 @@ t0 = time()
 u, v = pyimof.solvers.tvl1(I0, I1)
 t1 = time()
 
-pyimof.display.quiver(u, v, img=I0, ax=ax1)
+norm = np.sqrt(u*u + v*v)
+
+pyimof.display.quiver(u, v, c=norm, bg=I0, ax=ax1, bg_cmap='gray',
+                      vec_cmap='jet')
 pyimof.display.plot(u, v, ax=ax2, cmap=cmap)
 
 print("TV-L1 processing time: {:02f}sec".format(t1-t0))
@@ -29,7 +33,9 @@ t0 = time()
 u, v = pyimof.solvers.ilk(I0, I1)
 t1 = time()
 
-pyimof.display.quiver(u, v, img=None, ax=ax3)
+norm = np.sqrt(u*u + v*v)
+
+pyimof.display.quiver(u, v, c=norm, bg=norm, ax=ax3, vec_cmap='Greys')
 pyimof.display.plot(u, v, ax=ax4, cmap=cmap)
 
 print("ILK processing time: {:02f}sec".format(t1-t0))

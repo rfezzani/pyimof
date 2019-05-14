@@ -1,4 +1,4 @@
-"""Collection of available optical flow algorithms.
+"""Collection of optical flow algorithms.
 
 """
 
@@ -10,6 +10,47 @@ from .util import warp, coarse_to_fine, central_diff, forward_diff, div
 
 def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
     """TV-L1 solver for optical flow estimation.
+
+    Parameters
+    ----------
+    I0 : 2D ndarray
+        The first gray scale image of the sequence.
+    I1 : 2D ndarray
+        The second gray scale image of the sequence.
+    u0 : 2D ndarray
+        Initialization for the horizontal component of the vector
+        field.
+    v0 : 2D ndarray
+        Initialization for the vertical component of the vector
+        field.
+    dt : float
+        Time step of the numerical scheme. Convergence is proved for
+        values dt < 0.125, but it can be larger for faster
+        convergence.
+    lambda_ : float
+        Attachement parameter. The smaller this parameter is,
+        the smoother is the solutions.
+    tau : float
+        Tightness parameter. It should have a small value in order to
+        maintain attachement and regularization parts in
+        correspondence.
+    nwarp : int
+        Number of times I1 is warped.
+    niter : int
+        Number of fixed point iteration.
+    tol : float
+        Tolerance used as stopping criterion based on the L² distance
+        between two consecutive values of (u, v).
+    prefilter : bool
+        whether to prefilter the estimated optical flow before each
+        image warp.
+
+    Returns
+    -------
+    u : 2D ndarray
+        The horizontal component of the estimated optical flow.
+    v : 2D ndarray
+        The vertical component of the estimated optical flow.
 
     """
 
@@ -94,7 +135,66 @@ def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
 
 def tvl1(I0, I1, dt=0.2, lambda_=15, tau=0.3, nwarp=5, niter=10,
          tol=1e-4, prefilter=False):
-    """Coarse to fine TV-L1 optical flow estimator.
+    """Coarse to fine TV-L1 optical flow estimator. A popular algorithm
+    intrudced by Zack et al. [1]_, improved in [2]_ and detailed in [3]_.
+
+    Parameters
+    ----------
+    I0 : 2D ndarray
+        The first gray scale image of the sequence.
+    I1 : 2D ndarray
+        The second gray scale image of the sequence.
+    dt : float
+        Time step of the numerical scheme. Convergence is proved for
+        values dt < 0.125, but it can be larger for faster
+        convergence (default: 0.2).
+    lambda_ : float
+        Attachement parameter. The smaller this parameter is,
+        the smoother is the solutions (default: 15).
+    tau : float
+        Tightness parameter. It should have a small value in order to
+        maintain attachement and regularization parts in
+        correspondence (default: 0.3).
+    nwarp : int
+        Number of times I1 is warped (default: 5).
+    niter : int
+        Number of fixed point iteration (default: 10).
+    tol : float
+        Tolerance used as stopping criterion based on the L² distance
+        between two consecutive values of (u, v) (default: 1e-4).
+    prefilter : bool
+        whether to prefilter the estimated optical flow before each
+        image warp (default: False).
+
+    Returns
+    -------
+    u : 2D ndarray
+        The horizontal component of the estimated optical flow.
+    v : 2D ndarray
+        The vertical component of the estimated optical flow.
+
+    References
+    ----------
+    .. [1] Zach, C., Pock, T., & Bischof, H. (2007, September). A
+    duality based approach for realtime TV-L 1 optical flow. In Joint
+    pattern recognition symposium (pp. 214-223). Springer, Berlin,
+    Heidelberg.
+    .. [2] Wedel, A., Pock, T., Zach, C., Bischof, H., & Cremers,
+    D. (2009). An improved algorithm for TV-L 1 optical flow. In
+    Statistical and geometrical approaches to visual motion analysis
+    (pp. 23-45). Springer, Berlin, Heidelberg.
+    .. [3] Pérez, J. S., Meinhardt-Llopis, E., & Facciolo,
+    G. (2013). TV-L1 optical flow estimation. Image Processing On
+    Line, 2013, 137-150.
+
+    Examples
+    --------
+    >>> from matplotlib import pyplot as plt
+    >>> import pyimof
+    >>> I0, I1 = pyimof.data.yosemite()
+    >>> u, v = pyimov.solvers.tvl1(I0, I1)
+    >>> pyimov.display.plot(u, v)
+    >>> plt.show()
 
     """
 
@@ -107,6 +207,33 @@ def tvl1(I0, I1, dt=0.2, lambda_=15, tau=0.3, nwarp=5, niter=10,
 
 def _ilk(I0, I1, u0, v0, rad, nwarp, prefilter):
     """Iterative Lucas-Kanade (iLK) solver for optical flow estimation.
+
+    Parameters
+    ----------
+    I0 : 2D ndarray
+        The first gray scale image of the sequence.
+    I1 : 2D ndarray
+        The second gray scale image of the sequence.
+    u0 : 2D ndarray
+        Initialization for the horizontal component of the vector
+        field.
+    v0 : 2D ndarray
+        Initialization for the vertical component of the vector
+        field.
+    rad : int
+        Radius of the window considered around each pixel.
+    nwarp : int
+        Number of times I1 is warped.
+    prefilter : bool
+        whether to prefilter the estimated optical flow before each
+        image warp.
+
+    Returns
+    -------
+    u : 2D ndarray
+        The horizontal component of the estimated optical flow.
+    v : 2D ndarray
+        The vertical component of the estimated optical flow.
 
     """
 
@@ -149,7 +276,56 @@ def _ilk(I0, I1, u0, v0, rad, nwarp, prefilter):
 
 
 def ilk(I0, I1, rad=7, nwarp=10, prefilter=False):
-    """Coarse to fine iLK optical flow estimator.
+    """Coarse to fine iterative Lucas-Kanade (iLK) optical flow
+    estimator. A fast and robust algorithm developped by Le Besnerais
+    and Champagnat [1]_ [2]_..
+
+    Parameters
+    ----------
+    I0 : 2D ndarray
+        The first gray scale image of the sequence.
+    I1 : 2D ndarray
+        The second gray scale image of the sequence.
+    u0 : 2D ndarray
+        Initialization for the horizontal component of the vector
+        field.
+    v0 : 2D ndarray
+        Initialization for the vertical component of the vector
+        field.
+    rad : int
+        Radius of the window considered around each pixel.
+    nwarp : int
+        Number of times I1 is warped.
+    prefilter : bool
+        whether to prefilter the estimated optical flow before each
+        image warp.
+
+    Returns
+    -------
+    u : 2D ndarray
+        The horizontal component of the estimated optical flow.
+    v : 2D ndarray
+        The vertical component of the estimated optical flow.
+
+    References
+    ----------
+    .. [1] Le Besnerais, G., & Champagnat, F. (2005, September). Dense
+    optical flow by iterative local window registration. In IEEE
+    International Conference on Image Processing 2005 (Vol. 1,
+    pp. I-137). IEEE.
+    .. [2] Plyer, A., Le Besnerais, G., & Champagnat,
+    F. (2016). Massively parallel Lucas Kanade optical flow for
+    real-time video processing applications. Journal of Real-Time
+    Image Processing, 11(4), 713-730.
+
+    Examples
+    --------
+    >>> from matplotlib import pyplot as plt
+    >>> import pyimof
+    >>> I0, I1 = pyimof.data.yosemite()
+    >>> u, v = pyimov.solvers.ilk(I0, I1)
+    >>> pyimov.display.plot(u, v)
+    >>> plt.show()
 
     """
 
