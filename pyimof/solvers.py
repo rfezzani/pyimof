@@ -6,7 +6,9 @@
 from functools import partial
 import numpy as np
 from scipy import ndimage as ndi
-from .util import warp, coarse_to_fine, central_diff, forward_diff, div
+from skimage.transform import warp
+
+from .util import coarse_to_fine, central_diff, forward_diff, div
 
 
 def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
@@ -70,7 +72,11 @@ def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
     pv2 = np.zeros_like(u0)
 
     for _ in range(nwarp):
-        wI1 = warp(I1, u0, v0, x, y, prefilter)
+        if prefilter:
+            u = ndi.filters.median_filter(u, 3)
+            v = ndi.filters.median_filter(v, 3)
+
+        wI1 = warp(I1, np.array([y+v, x+u]), mode='nearest')
         Ix, Iy = central_diff(wI1)
         NI = Ix*Ix + Iy*Iy
         NI[NI == 0] = 1
@@ -247,7 +253,11 @@ def _ilk(I0, I1, u0, v0, rad, nwarp, prefilter):
     v = v0.copy()
 
     for _ in range(nwarp):
-        wI1 = warp(I1, u, v, x, y, prefilter)
+        if prefilter:
+            u = ndi.filters.median_filter(u, 3)
+            v = ndi.filters.median_filter(v, 3)
+
+        wI1 = warp(I1, np.array([y+v, x+u]), mode='nearest')
         Ix, Iy = central_diff(wI1)
         It = wI1 - I0 - u*Ix - v*Iy
 

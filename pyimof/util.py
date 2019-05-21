@@ -92,56 +92,6 @@ def div(p1, p2):
     return div_p
 
 
-def warp(I, u, v, x=None, y=None, prefilter=True, order=2, mode='nearest'):
-    """Image warping using the motion field (u, v).
-
-    Parameters
-    ----------
-    I : 2D ndarray
-        The gray scale image to be warped.
-    u : 2D ndarray
-        The horizontal component of the motion field.
-    v : 2D ndarray
-        The vertical component of the motion field.
-    x : 2D ndarray
-        The horizontal coordinate where the motion field is
-        evaluated. If None, meshgrid is used to compute this location
-        (default: None).
-    y : 2D ndarray
-        The vertical coordinate where the motion field is
-        evaluated. If None, meshgrid is used to compute this location
-        (default: None).
-    prefilter : bool
-        whether to apply median filter to u and v before warping.
-    order : int
-        Spline order used for the interpolation. Should be between 0
-        and 5. (default: 2)
-    mode : str
-        Border management mode. Suuported modes are the same as for
-        scipy.ndimage.map_coordinates. (default: 'nearest').
-
-    Returns
-    -------
-    wI : 2D ndarray
-        The warped version on I using (u, v).
-
-    """
-    if (x is None) or (y is None):
-        nl, nc = I.shape
-        y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
-
-    if prefilter:
-        u_ = ndi.filters.median_filter(u, 3)
-        v_ = ndi.filters.median_filter(v, 3)
-    else:
-        u_ = u
-        v_ = v
-
-    wI = ndi.map_coordinates(I, [y+v_, x+u_], order=order, mode=mode)
-
-    return wI
-
-
 def resize_flow(u, v, shape):
     """Rescale the values of the vector field (u, v) to the desired shape.
 
