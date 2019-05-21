@@ -183,16 +183,16 @@ def tvl1(I0, I1, dt=0.2, lambda_=15, tau=0.3, nwarp=5, niter=10,
     References
     ----------
     .. [1] Zach, C., Pock, T., & Bischof, H. (2007, September). A
-    duality based approach for realtime TV-L 1 optical flow. In Joint
-    pattern recognition symposium (pp. 214-223). Springer, Berlin,
-    Heidelberg.
+       duality based approach for realtime TV-L 1 optical flow. In Joint
+       pattern recognition symposium (pp. 214-223). Springer, Berlin,
+       Heidelberg.
     .. [2] Wedel, A., Pock, T., Zach, C., Bischof, H., & Cremers,
-    D. (2009). An improved algorithm for TV-L 1 optical flow. In
-    Statistical and geometrical approaches to visual motion analysis
-    (pp. 23-45). Springer, Berlin, Heidelberg.
+       D. (2009). An improved algorithm for TV-L 1 optical flow. In
+       Statistical and geometrical approaches to visual motion analysis
+       (pp. 23-45). Springer, Berlin, Heidelberg.
     .. [3] Pérez, J. S., Meinhardt-Llopis, E., & Facciolo,
-    G. (2013). TV-L1 optical flow estimation. Image Processing On
-    Line, 2013, 137-150.
+       G. (2013). TV-L1 optical flow estimation. Image Processing On
+       Line, 2013, 137-150.
 
     Examples
     --------
@@ -289,7 +289,7 @@ def _ilk(I0, I1, u0, v0, rad, nwarp, prefilter):
 def ilk(I0, I1, rad=7, nwarp=10, prefilter=False):
     """Coarse to fine iterative Lucas-Kanade (iLK) optical flow
     estimator. A fast and robust algorithm developped by Le Besnerais
-    and Champagnat [1]_ [2]_..
+    and Champagnat [4]_ [5]_..
 
     Parameters
     ----------
@@ -320,14 +320,14 @@ def ilk(I0, I1, rad=7, nwarp=10, prefilter=False):
 
     References
     ----------
-    .. [1] Le Besnerais, G., & Champagnat, F. (2005, September). Dense
-    optical flow by iterative local window registration. In IEEE
-    International Conference on Image Processing 2005 (Vol. 1,
-    pp. I-137). IEEE.
-    .. [2] Plyer, A., Le Besnerais, G., & Champagnat,
-    F. (2016). Massively parallel Lucas Kanade optical flow for
-    real-time video processing applications. Journal of Real-Time
-    Image Processing, 11(4), 713-730.
+    .. [4] Le Besnerais, G., & Champagnat, F. (2005, September). Dense
+       optical flow by iterative local window registration. In IEEE
+       International Conference on Image Processing 2005 (Vol. 1,
+       pp. I-137). IEEE.
+    .. [5] Plyer, A., Le Besnerais, G., & Champagnat,
+       F. (2016). Massively parallel Lucas Kanade optical flow for
+       real-time video processing applications. Journal of Real-Time
+       Image Processing, 11(4), 713-730.
 
     Examples
     --------
