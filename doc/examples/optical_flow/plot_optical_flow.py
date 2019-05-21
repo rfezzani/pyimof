@@ -11,7 +11,7 @@ import pyimof
 
 # --- Load data
 
-I0, I1 = pyimof.data.minicooper()
+I0, I1 = pyimof.data.walking()
 
 fig = plt.figure(figsize=((8, 7)))
 ax1, ax2, ax3, ax4 = fig.subplots(2, 2).ravel()
