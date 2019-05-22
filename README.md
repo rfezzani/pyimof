@@ -6,6 +6,28 @@ flow](https://en.wikipedia.org/wiki/Optical_flow) estimation. A good
 introduction to optical flow techniques can be found
 [here](https://blog.nanonets.com/optical-flow/).
 
+## Quick Example
+
+Using Pyimov is as easy as
+
+```python
+from matplotlib import pyplot as plt
+import pyimof
+I0, I1 = pyimof.data.hydrangea()
+u, v = pyimof.solvers.tvl1(I0, I1)
+pyimof.display.plot(u, v)
+plt.show()
+```
+
+to obtain
+
+![Hydrangea][doc/source/_static/hydrangea.png]
+
+# Overview
+
+Pyimof actually only supports gray scale images in its implemented
+methods.
+
 ## Implemented methods
 
 Optical flow algorithms can mainly be classified into:
@@ -18,10 +40,11 @@ Optical flow algorithms can mainly be classified into:
   paradigm.
 
 Pyimof provides one implementation for each of these class of methods:
-- **TV-L1**: A popular algorithm intrudced by Zack _et al._ [1],
+- **TV-L1**: A popular algorithm introduced by Zack _et al._ [1],
     improved in [2] and detailed in [3] (See `pyimof.solvers.tvl1`).
 - **Iterative Lucas-kanade**: A fast and robust algorithm developped
-    by Le Besnerais and Champagnat [4] [5] (See `pyimof.solvers.ilk`).
+    by Le Besnerais and Champagnat [4] and improved in [5] (See
+    `pyimof.solvers.ilk`).
 
 These two algorithms have been selected for theire relative
 speed. Efficient GPU implementations for both of them have been
@@ -33,14 +56,14 @@ Multiple datasets for the evaluation of optical flow algorithms have
 been developped (for example
 [Middlebury](http://vision.middlebury.edu/flow/),
 [MPI-Sintel](http://sintel.is.tue.mpg.de/) and [Flying
-Chairs](https://lmb.informatik.uni-freiburg.de/resources/datasets/FlyingChairs.en.html)). The
-**Middlebury** dataset [6] is accessible via the `pyimof.data` module
-functions to ease testing.
+Chairs](https://lmb.informatik.uni-freiburg.de/resources/datasets/FlyingChairs.en.html)).
+The two-frame grayscale **Middlebury** training dataset [6] is
+accessible via the `pyimof.data` module functions to ease testing.
 
 ## IO
 
-Estimated vector fields can be saved and loaded in the _.flo_ format
-using the `pyimof.io` module.
+Estimated vector fields can be saved and loaded in the _.flo_ file
+format using the `pyimof.io` module.
 
 ## Visualization
 

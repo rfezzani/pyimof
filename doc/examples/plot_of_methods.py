@@ -1,5 +1,9 @@
 # coding: utf-8
-"""Demostration to the Pyimof package.
+"""
+TV-L1 vs iLK
+============
+
+Comparison the TV-L1 and iLK methods for the optical flow estimation.
 
 """
 
@@ -11,7 +15,7 @@ import pyimof
 
 # --- Load data
 
-I0, I1 = pyimof.data.rubberwhale()
+I0, I1 = pyimof.data.hydrangea()
 
 fig = plt.figure(figsize=((8, 7)))
 ax1, ax2, ax3, ax4 = fig.subplots(2, 2).ravel()
