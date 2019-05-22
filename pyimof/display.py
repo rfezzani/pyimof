@@ -283,9 +283,11 @@ def quiver(u, v, c=None, bg=None, ax=None, step=None, nvec=50,
     idx = np.logical_and(np.logical_and(x+u_ >= 0, x+u_ <= nc-1),
                          np.logical_and(y+v_ >= 0, y+v_ <= nl-1))
 
-    ax.axis([0, nc, nl, 0])
     if bg is not None:
         ax.imshow(bg, cmap=bg_cmap)
+    else:
+        ax.axis([0, nc, nl, 0])
+        ax.set_aspect('equal')
 
     args = [x[idx], y[idx], u_[idx], v_[idx]]
     if c is not None:
