@@ -21,7 +21,7 @@ plt.show()
 
 to obtain
 
-![Hydrangea][doc/source/_static/hydrangea.png]
+![Hydrangea](doc/source/_static/hydrangea.png)
 
 # Overview
 
