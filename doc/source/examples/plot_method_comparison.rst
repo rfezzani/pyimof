@@ -1,10 +1,10 @@
 .. note::
     :class: sphx-glr-download-link-note
 
-    Click :ref:`here <sphx_glr_download_examples_plot_of_methods.py>` to download the full example code
+    Click :ref:`here <sphx_glr_download_examples_plot_method_comparison.py>` to download the full example code
 .. rst-class:: sphx-glr-example-title
 
-.. _sphx_glr_examples_plot_of_methods.py:
+.. _sphx_glr_examples_plot_method_comparison.py:
 
 
 TV-L1 vs iLK
@@ -13,7 +13,7 @@ TV-L1 vs iLK
 Comparison the TV-L1 and iLK methods for the optical flow estimation.
 
 
-.. image:: /examples/images/sphx_glr_plot_of_methods_001.png
+.. image:: /examples/images/sphx_glr_plot_method_comparison_001.png
     :class: sphx-glr-single-img
 
 
@@ -24,41 +24,41 @@ Comparison the TV-L1 and iLK methods for the optical flow estimation.
  .. code-block:: none
 
     Processing the Beanbags sequence
-            TV-L1 processing time: 2.675980sec
-            ILK processing time: 0.454525sec
+            TV-L1 processing time: 2.598048sec
+            ILK processing time: 0.454992sec
     Processing the Dimetrodon sequence
-            TV-L1 processing time: 1.890444sec
-            ILK processing time: 0.341305sec
+            TV-L1 processing time: 1.877484sec
+            ILK processing time: 0.313538sec
     Processing the Dogdance sequence
-            TV-L1 processing time: 2.702451sec
-            ILK processing time: 0.459724sec
+            TV-L1 processing time: 2.664790sec
+            ILK processing time: 0.458793sec
     Processing the Grove2 sequence
-            TV-L1 processing time: 2.912386sec
-            ILK processing time: 0.458680sec
+            TV-L1 processing time: 2.905357sec
+            ILK processing time: 0.456460sec
     Processing the Grove3 sequence
-            TV-L1 processing time: 3.053227sec
-            ILK processing time: 0.465650sec
+            TV-L1 processing time: 2.968026sec
+            ILK processing time: 0.458371sec
     Processing the Hydrangea sequence
-            TV-L1 processing time: 2.130017sec
-            ILK processing time: 0.310015sec
+            TV-L1 processing time: 2.124195sec
+            ILK processing time: 0.313094sec
     Processing the Minicooper sequence
-            TV-L1 processing time: 2.833099sec
-            ILK processing time: 0.452423sec
+            TV-L1 processing time: 2.884015sec
+            ILK processing time: 0.457555sec
     Processing the Rubberwhale sequence
-            TV-L1 processing time: 2.192868sec
-            ILK processing time: 0.309699sec
+            TV-L1 processing time: 2.235224sec
+            ILK processing time: 0.312935sec
     Processing the Urban2 sequence
-            TV-L1 processing time: 2.647870sec
-            ILK processing time: 0.459278sec
+            TV-L1 processing time: 2.663834sec
+            ILK processing time: 0.457162sec
     Processing the Urban3 sequence
-            TV-L1 processing time: 2.583509sec
-            ILK processing time: 0.459012sec
+            TV-L1 processing time: 2.621930sec
+            ILK processing time: 0.458131sec
     Processing the Venus sequence
-            TV-L1 processing time: 1.392309sec
-            ILK processing time: 0.223192sec
+            TV-L1 processing time: 1.429141sec
+            ILK processing time: 0.228746sec
     Processing the Walking sequence
-            TV-L1 processing time: 2.417811sec
-            ILK processing time: 0.458810sec
+            TV-L1 processing time: 2.456856sec
+            ILK processing time: 0.458667sec
 
 
 
@@ -126,10 +126,10 @@ Comparison the TV-L1 and iLK methods for the optical flow estimation.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  36.087 seconds)
+   **Total running time of the script:** ( 0 minutes  35.773 seconds)
 
 
-.. _sphx_glr_download_examples_plot_of_methods.py:
+.. _sphx_glr_download_examples_plot_method_comparison.py:
 
 
 .. only :: html
@@ -141,13 +141,13 @@ Comparison the TV-L1 and iLK methods for the optical flow estimation.
 
   .. container:: sphx-glr-download
 
-     :download:`Download Python source code: plot_of_methods.py <plot_of_methods.py>`
+     :download:`Download Python source code: plot_method_comparison.py <plot_method_comparison.py>`
 
 
 
   .. container:: sphx-glr-download
 
-     :download:`Download Jupyter notebook: plot_of_methods.ipynb <plot_of_methods.ipynb>`
+     :download:`Download Jupyter notebook: plot_method_comparison.ipynb <plot_method_comparison.ipynb>`
 
 
 .. only:: html

@@ -11,13 +11,13 @@ Pyimof gallery
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Comparison the TV-L1 and iLK methods for the optical flow estimation.">
+    <div class="sphx-glr-thumbcontainer" tooltip="Demonstration of colormap application to a vector field.">
 
 .. only:: html
 
-    .. figure:: /examples/images/thumb/sphx_glr_plot_of_methods_thumb.png
+    .. figure:: /examples/images/thumb/sphx_glr_plot_color_code_thumb.png
 
-        :ref:`sphx_glr_examples_plot_of_methods.py`
+        :ref:`sphx_glr_examples_plot_color_code.py`
 
 .. raw:: html
 
@@ -27,7 +27,27 @@ Pyimof gallery
 .. toctree::
    :hidden:
 
-   /examples/plot_of_methods
+   /examples/plot_color_code
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Comparison the TV-L1 and iLK methods for the optical flow estimation.">
+
+.. only:: html
+
+    .. figure:: /examples/images/thumb/sphx_glr_plot_method_comparison_thumb.png
+
+        :ref:`sphx_glr_examples_plot_method_comparison.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/plot_method_comparison
 .. raw:: html
 
     <div style='clear:both'></div>
