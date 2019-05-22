@@ -2,6 +2,19 @@ from functools import partial
 import os
 import imageio
 
+__all__ = ['beanbags',
+           'dimetrodon',
+           'dogdance',
+           'grove2',
+           'grove3',
+           'hydrangea',
+           'minicooper',
+           'rubberwhale',
+           'urban2',
+           'urban3',
+           'venus',
+           'walking']
+
 
 _data_path = os.path.dirname(__file__)
 

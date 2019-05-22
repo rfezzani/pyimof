@@ -23,8 +23,42 @@ Comparison the TV-L1 and iLK methods for the optical flow estimation.
 
  .. code-block:: none
 
-    TV-L1 processing time: 2.169795sec
-    ILK processing time: 0.312307sec
+    Processing the Beanbags sequence
+            TV-L1 processing time: 2.675980sec
+            ILK processing time: 0.454525sec
+    Processing the Dimetrodon sequence
+            TV-L1 processing time: 1.890444sec
+            ILK processing time: 0.341305sec
+    Processing the Dogdance sequence
+            TV-L1 processing time: 2.702451sec
+            ILK processing time: 0.459724sec
+    Processing the Grove2 sequence
+            TV-L1 processing time: 2.912386sec
+            ILK processing time: 0.458680sec
+    Processing the Grove3 sequence
+            TV-L1 processing time: 3.053227sec
+            ILK processing time: 0.465650sec
+    Processing the Hydrangea sequence
+            TV-L1 processing time: 2.130017sec
+            ILK processing time: 0.310015sec
+    Processing the Minicooper sequence
+            TV-L1 processing time: 2.833099sec
+            ILK processing time: 0.452423sec
+    Processing the Rubberwhale sequence
+            TV-L1 processing time: 2.192868sec
+            ILK processing time: 0.309699sec
+    Processing the Urban2 sequence
+            TV-L1 processing time: 2.647870sec
+            ILK processing time: 0.459278sec
+    Processing the Urban3 sequence
+            TV-L1 processing time: 2.583509sec
+            ILK processing time: 0.459012sec
+    Processing the Venus sequence
+            TV-L1 processing time: 1.392309sec
+            ILK processing time: 0.223192sec
+    Processing the Walking sequence
+            TV-L1 processing time: 2.417811sec
+            ILK processing time: 0.458810sec
 
 
 
@@ -36,53 +70,63 @@ Comparison the TV-L1 and iLK methods for the optical flow estimation.
 
 
     from time import time
-    import numpy as np
     import matplotlib.pyplot as plt
     import pyimof
 
 
-    # --- Load data
+    seq_list = pyimof.data.__all__
+    seq_count = len(seq_list)
 
-    I0, I1 = pyimof.data.hydrangea()
+    fig = plt.figure(figsize=((9, 2*seq_count)))
+    ax_array = fig.subplots(seq_count, 3)
+    ax_array[0, 0].set_title("Reference image")
+    ax_array[0, 1].set_title("TV-L1 result")
+    ax_array[0, 2].set_title("iLK result")
 
-    fig = plt.figure(figsize=((8, 7)))
-    ax1, ax2, ax3, ax4 = fig.subplots(2, 2).ravel()
-    cmap = 'middlebury'
-    plt.tight_layout()
+    # --- Loop over available sequences
 
-    # --- TV-L1
+    for name, (ax0, ax1, ax2) in zip(seq_list, ax_array):
 
-    t0 = time()
-    u, v = pyimof.solvers.tvl1(I0, I1)
-    t1 = time()
+        title = name.capitalize()
 
-    norm = np.sqrt(u*u + v*v)
+        print(f"Processing the {title} sequence")
 
-    pyimof.display.quiver(u, v, c=norm, bg=I0, ax=ax1, bg_cmap='gray',
-                          vec_cmap='jet')
-    pyimof.display.plot(u, v, ax=ax2, cmap=cmap)
+        # --- Load data
+        I0, I1 = pyimof.data.__dict__[name]()
 
-    print("TV-L1 processing time: {:02f}sec".format(t1-t0))
+        ax0.imshow(I0, cmap='gray')
+        ax0.set_ylabel(title)
+        ax0.set_xticks([])
+        ax0.set_yticks([])
 
-    # --- iLK
+        # --- Run TV-L1
 
-    t0 = time()
-    u, v = pyimof.solvers.ilk(I0, I1)
-    t1 = time()
+        t0 = time()
+        u, v = pyimof.solvers.tvl1(I0, I1)
+        t1 = time()
 
-    norm = np.sqrt(u*u + v*v)
+        pyimof.display.plot(u, v, ax=ax1, colorwheel=False)
 
-    pyimof.display.quiver(u, v, c=norm, bg=norm, ax=ax3, vec_cmap='Greys')
-    pyimof.display.plot(u, v, ax=ax4, cmap=cmap)
+        print("\tTV-L1 processing time: {:02f}sec".format(t1-t0))
 
-    print("ILK processing time: {:02f}sec".format(t1-t0))
+        # --- Run iLK
+
+        t0 = time()
+        u, v = pyimof.solvers.ilk(I0, I1)
+        t1 = time()
+
+        pyimof.display.plot(u, v, ax=ax2, colorwheel=False)
+
+        print("\tILK processing time: {:02f}sec".format(t1-t0))
+
+    fig.tight_layout()
 
     plt.show()
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.145 seconds)
+   **Total running time of the script:** ( 0 minutes  36.087 seconds)
 
 
 .. _sphx_glr_download_examples_plot_of_methods.py:
