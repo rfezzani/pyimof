@@ -11,6 +11,26 @@ Pyimof gallery
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Demonstration of vector field quiver plot.">
+
+.. only:: html
+
+    .. figure:: /examples/images/thumb/sphx_glr_plot_quiver_thumb.png
+
+        :ref:`sphx_glr_examples_plot_quiver.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/plot_quiver
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Demonstration of colormap application to a vector field.">
 
 .. only:: html
@@ -62,13 +82,13 @@ Pyimof gallery
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Python source code: examples_python.zip <//home/rfez/Projects/Misc/pyimof/doc/source/../source/examples/examples_python.zip>`
+    :download:`Download all examples in Python source code: examples_python.zip <//home/rfezzani/Projects/pyimof/doc/source/../source/examples/examples_python.zip>`
 
 
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Jupyter notebooks: examples_jupyter.zip <//home/rfez/Projects/Misc/pyimof/doc/source/../source/examples/examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: examples_jupyter.zip <//home/rfezzani/Projects/pyimof/doc/source/../source/examples/examples_jupyter.zip>`
 
 
 .. only:: html

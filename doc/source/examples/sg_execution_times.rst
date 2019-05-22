@@ -5,7 +5,8 @@
 
 Computation times
 =================
-**00:01.347** total execution time for **examples** files:
+**00:01.914** total execution time for **examples** files:
 
-- **00:01.347**: :ref:`sphx_glr_examples_plot_color_code.py` (``plot_color_code.py``)
+- **00:01.914**: :ref:`sphx_glr_examples_plot_quiver.py` (``plot_quiver.py``)
+- **00:00.000**: :ref:`sphx_glr_examples_plot_color_code.py` (``plot_color_code.py``)
 - **00:00.000**: :ref:`sphx_glr_examples_plot_method_comparison.py` (``plot_method_comparison.py``)
