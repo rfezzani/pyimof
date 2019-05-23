@@ -231,20 +231,20 @@ def plot(u, v, ax=None, cmap='middlebury', scale=True, colorwheel=True):
     return ax
 
 
-def quiver(u, v, c=None, bg=None, ax=None, step=None, nvec=50,
-           vec_cmap=None, bg_cmap=None):
-    """Draws a quiver plot representing a vector field.
+def quiver(u, v, c=None, bg=None, ax=None, step=None, nvec=50, bg_cmap=None,
+           **kwargs):
+    """Draws a quiver plot representing a dense vector field.
 
     Parameters
     ----------
-    u : 2D ndarray
+    u : 2D ndarray with shape (m, n)
         The horizontal component of the vector field.
-    v : 2D ndarray
+    v : 2D ndarray with shape (m, n)
         The vertical component of the vector field.
-    c : 2D ndarray
+    c : 2D ndarray with shape (m, n)
         Optional array of values used to color the arrows.
     bg : 2D or 3D ndarray or None
-        An optional background image.
+        Optional background image.
     ax : Axes
         Optional matplotlib axes used to plot the image. If None, the
         image is displayed in a tight figure (default: None).
@@ -254,10 +254,17 @@ def quiver(u, v, c=None, bg=None, ax=None, step=None, nvec=50,
     nvec : int
         The maximum number of vector over all the grid dimentions. It
         is ignored if the step parameter is not None (default: 50).
-    vec_cmap : str or None
-        The colormap used to color the arrows (default: None).
     bg_cmap : str or None
         The colormap used to color the background image (default: None).
+
+    Notes
+    -----
+    Any other ``pyplot.quiver`` valid keyword can be used, knowing
+    that some are fixed
+
+    - units = 'dots'
+    - angles = 'xy'
+    - scale = 'xy'
 
     Returns
     -------
@@ -293,8 +300,11 @@ def quiver(u, v, c=None, bg=None, ax=None, step=None, nvec=50,
     if c is not None:
         args.append(c[::step, ::step][idx])
 
-    ax.quiver(*args, units='dots', angles='xy', scale_units='xy',
-              cmap=vec_cmap)
+    kwargs['units'] = 'dots'
+    kwargs['angles'] = 'xy'
+    kwargs['scale_units'] = 'xy'
+
+    ax.quiver(*args, **kwargs)
     ax.set_axis_off()
 
     return ax
