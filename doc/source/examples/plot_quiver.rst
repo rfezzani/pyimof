@@ -49,10 +49,10 @@ Demonstration of vector field quiver plot.
 
     pyimof.display.quiver(u, v, ax=ax1)
 
-    pyimof.display.quiver(u, v, norm, I0, ax=ax2,
+    pyimof.display.quiver(u, v, c=norm, bg=I0, ax=ax2,
                           cmap='jet', bg_cmap='gray')
 
-    pyimof.display.quiver(u, v, norm, norm, ax=ax3,
+    pyimof.display.quiver(u, v, c=norm, bg=norm, ax=ax3,
                           cmap='Greys', bg_cmap='viridis')
 
     plt.show()
@@ -60,7 +60,7 @@ Demonstration of vector field quiver plot.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.051 seconds)
+   **Total running time of the script:** ( 0 minutes  1.055 seconds)
 
 
 .. _sphx_glr_download_examples_plot_quiver.py:

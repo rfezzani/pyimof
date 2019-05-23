@@ -6,13 +6,14 @@
 Welcome to Pyimof's documentation!
 ==================================
 
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    overview
-   examples/index
    modules
+   examples/index
 
 Introduction
 ============
