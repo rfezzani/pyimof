@@ -18,7 +18,7 @@ def _middlebury():
 
     Returns
     -------
-    cmap : 2D ndarray
+    cmap : ~numpy.ndarray
         The colors used to generate the 'middlebury' colormap.
 
     References
@@ -61,11 +61,11 @@ def flow_to_color(u, v, cmap=None, scale=True):
 
     Parameters
     ----------
-    u : 2D ndarray
+    u : ~numpy.ndarray
         The horizontal component of the vector field.
-    v : 2D ndarray
+    v : ~numpy.ndarray
         The vertical component of the vector field.
-    cmap : str or None
+    cmap : str (optional)
         The colormap used to color code the input vector field
         (default: None)
     scale : bool
@@ -74,7 +74,7 @@ def flow_to_color(u, v, cmap=None, scale=True):
 
     Returns
     -------
-    img : 3D ndarray
+    img : ~numpy.ndarray
         RGBA image representing the desired color code applyed to the
         vector field.
 
@@ -120,20 +120,20 @@ def color_wheel(u=None, v=None, nr=50, ntheta=1025):
 
     Parameters
     ----------
-    u : 2D ndarray or None
+    u : ~numpy.ndarray (optional)
         The horizontal component of the vector field (default: None).
-    v : 2D ndarray or None
+    v : ~numpy.ndarray (optional)
         The vertical component of the vector field (default: None).
-    nr : int
+    nr : int (optional)
         The number of steps used to discretise the wheel radius.
-    ntheta : int
+    ntheta : int (optional)
         The number of steps used to discretise the wheel sectors.
 
     Returns
     -------
-    angle : 2D ndarray
+    angle : ~numpy.ndarray
         The grid discretisation of the wheel sectors.
-    radius : 2D ndarray
+    radius : ~numpy.ndarray
         The grid discretisation of the wheel radius.
 
     """
@@ -150,7 +150,7 @@ def get_tight_figsize(I):
 
     Parameters
     ----------
-    I : 2D or 3D ndarray
+    I : ~numpy.ndarray
         The image to be displayed.
 
     Returns
@@ -178,26 +178,26 @@ def plot(u, v, ax=None, cmap='middlebury', scale=True, colorwheel=True):
 
     Parameters
     ----------
-    u : 2D ndarray
+    u : ~numpy.ndarray
         The horizontal component of the vector field.
-    v : 2D ndarray
+    v : ~numpy.ndarray
         The vertical component of the vector field.
-    ax : Axes
+    ax : ~matplotlib.pyplot.Axes (optional)
         Optional matplotlib axes used to plot the image. If None, the
         image is displayed in a tight figure (default: None).
-    cmap : str or None
+    cmap : str (optional)
         The colormap used to color code the input vector field
         (default: 'middlebury')
-    scale : bool
+    scale : bool (optional)
         whether to scale output saturation according to magnitude
         (default: True).
-    colorwheel : bool
+    colorwheel : bool (optional)
         whether to display the color wheel describing the images
         colors or not (default: True).
 
     Returns
     -------
-    ax : Axes
+    ax : ~matplotlib.pyplot.Axes
         The matplotlib axes where the image is displayed.
 
     """
@@ -237,24 +237,24 @@ def quiver(u, v, c=None, bg=None, ax=None, step=None, nvec=50, bg_cmap=None,
 
     Parameters
     ----------
-    u : 2D ndarray with shape (m, n)
+    u : ~numpy.ndarray with shape (m, n)
         The horizontal component of the vector field.
-    v : 2D ndarray with shape (m, n)
+    v : ~numpy.ndarray with shape (m, n)
         The vertical component of the vector field.
-    c : 2D ndarray with shape (m, n)
+    c : ~numpy.ndarray (optional with shape (m, n))
         Optional array of values used to color the arrows.
-    bg : 2D or 3D ndarray or None
+    bg : ~numpy.ndarray (2D or 3D optional)
         Optional background image.
-    ax : Axes
+    ax : ~matplotlib.pyplot.Axes
         Optional matplotlib axes used to plot the image. If None, the
         image is displayed in a tight figure (default: None).
-    step : int or None
+    step : int (optional)
         The grid step used to display the vector field. If None, it is
         computed using the nvec parameter (default: None).
     nvec : int
         The maximum number of vector over all the grid dimentions. It
         is ignored if the step parameter is not None (default: 50).
-    bg_cmap : str or None
+    bg_cmap : str (optional)
         The colormap used to color the background image (default: None).
 
     Notes
@@ -268,7 +268,7 @@ def quiver(u, v, c=None, bg=None, ax=None, step=None, nvec=50, bg_cmap=None,
 
     Returns
     -------
-    ax : Axes
+    ax : ~matplotlib.pyplot.Axes
         The matplotlib axes where the vector field is displayed.
 
     """

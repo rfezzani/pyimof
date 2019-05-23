@@ -63,6 +63,7 @@ html_theme_options = {
     'github_user': 'rfezzani',
     'github_repo': 'pyimof',
     'github_banner': True,
+    'github_button': True
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -77,4 +78,6 @@ sphinx_gallery_conf = {
 }
 
 intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
-                       'numpy': ('http://docs.scipy.org/doc/numpy/', None)}
+                       'numpy': ('http://docs.scipy.org/doc/numpy/', None),
+                       'matplotlib': ('http://matplotlib.sourceforge.net',
+                                      None)}
