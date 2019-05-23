@@ -1,2 +1,2 @@
-sphinx
-sphinx-gallery
+sphinx >= 2.0
+sphinx-gallery >= 0.3
