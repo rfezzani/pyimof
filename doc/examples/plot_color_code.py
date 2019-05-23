@@ -40,8 +40,10 @@ u, v = pyimof.solvers.ilk(I0, I1)
 # --- Display it with different colormaps
 
 fig = plt.figure(figsize=((9, 10)))
-ax0, ax1, ax2, ax3, ax4, ax5 = fig.subplots(3, 2, True, True).ravel()
+ax_arr = fig.subplots(3, 2, True, True)
 fig.tight_layout()
+
+ax0, ax1 = ax_arr[0, :]
 
 ax0.imshow(I0, cmap='gray')
 ax0.set_axis_off()
@@ -50,16 +52,10 @@ ax0.set_title("Reference image")
 pyimof.display.plot(u, v, ax=ax1, cmap=None)
 ax1.set_title("Vector field to HSV image")
 
-pyimof.display.plot(u, v, ax=ax2, cmap='middlebury')
-ax2.set_title("'middlebury' colormap")
+cmap_list = ['middlebury', 'hsv', 'twilight', 'twilight_shifted']
 
-pyimof.display.plot(u, v, ax=ax3, cmap='hsv')
-ax3.set_title("'hsv' colormap")
-
-pyimof.display.plot(u, v, ax=ax4, cmap='twilight')
-ax4.set_title("'twilight' colormap")
-
-pyimof.display.plot(u, v, ax=ax5, cmap='twilight_shifted')
-ax5.set_title("'twilight_shifted' colormap")
+for ax, cm in zip(ax_arr[1:, :].ravel(), cmap_list):
+    pyimof.display.plot(u, v, ax=ax, cmap=cm)
+    ax.set_title(f"'{cm}' colormap")
 
 plt.show()

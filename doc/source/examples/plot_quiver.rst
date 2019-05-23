@@ -27,9 +27,9 @@ Demonstration of vector field quiver plot.
     import matplotlib.pyplot as plt
     import pyimof
 
-    # --- Load the Hydrangea sequence
+    # --- Load the MiniCooper sequence
 
-    I0, I1 = pyimof.data.grove2()
+    I0, I1 = pyimof.data.minicooper()
 
     # --- Estimate the optical flow
 
@@ -37,7 +37,7 @@ Demonstration of vector field quiver plot.
 
     norm = np.sqrt(u*u + v*v)
 
-    # --- Display it with different colormaps
+    # --- Display it with different options
 
     fig = plt.figure(figsize=((9, 7)))
     ax0, ax1, ax2, ax3 = fig.subplots(2, 2, True, True).ravel()
@@ -60,7 +60,7 @@ Demonstration of vector field quiver plot.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.914 seconds)
+   **Total running time of the script:** ( 0 minutes  1.048 seconds)
 
 
 .. _sphx_glr_download_examples_plot_quiver.py:

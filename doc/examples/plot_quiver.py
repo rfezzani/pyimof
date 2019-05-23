@@ -11,9 +11,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pyimof
 
-# --- Load the Hydrangea sequence
+# --- Load the MiniCooper sequence
 
-I0, I1 = pyimof.data.grove2()
+I0, I1 = pyimof.data.minicooper()
 
 # --- Estimate the optical flow
 
@@ -21,7 +21,7 @@ u, v = pyimof.solvers.ilk(I0, I1)
 
 norm = np.sqrt(u*u + v*v)
 
-# --- Display it with different colormaps
+# --- Display it with different options
 
 fig = plt.figure(figsize=((9, 7)))
 ax0, ax1, ax2, ax3 = fig.subplots(2, 2, True, True).ravel()

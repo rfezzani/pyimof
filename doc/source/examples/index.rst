@@ -82,13 +82,13 @@ Pyimof gallery
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Python source code: examples_python.zip <//home/rfezzani/Projects/pyimof/doc/source/../source/examples/examples_python.zip>`
+    :download:`Download all examples in Python source code: examples_python.zip <//home/rfez/Projects/Misc/pyimof/doc/source/../source/examples/examples_python.zip>`
 
 
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Jupyter notebooks: examples_jupyter.zip <//home/rfezzani/Projects/pyimof/doc/source/../source/examples/examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: examples_jupyter.zip <//home/rfez/Projects/Misc/pyimof/doc/source/../source/examples/examples_jupyter.zip>`
 
 
 .. only:: html
