@@ -33,10 +33,10 @@ ax0.set_title("Reference image")
 
 pyimof.display.quiver(u, v, ax=ax1)
 
-pyimof.display.quiver(u, v, norm, I0, ax=ax2,
+pyimof.display.quiver(u, v, c=norm, bg=I0, ax=ax2,
                       cmap='jet', bg_cmap='gray')
 
-pyimof.display.quiver(u, v, norm, norm, ax=ax3,
+pyimof.display.quiver(u, v, c=norm, bg=norm, ax=ax3,
                       cmap='Greys', bg_cmap='viridis')
 
 plt.show()
