@@ -16,14 +16,14 @@ def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
 
     Parameters
     ----------
-    I0 : 2D ~numpy.ndarray
+    I0 : ~numpy.ndarray
         The first gray scale image of the sequence.
-    I1 : 2D ~numpy.ndarray
+    I1 : ~numpy.ndarray
         The second gray scale image of the sequence.
-    u0 : 2D ~numpy.ndarray
+    u0 : ~numpy.ndarray
         Initialization for the horizontal component of the vector
         field.
-    v0 : 2D ~numpy.ndarray
+    v0 : ~numpy.ndarray
         Initialization for the vertical component of the vector
         field.
     dt : float
@@ -50,9 +50,9 @@ def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
 
     Returns
     -------
-    u : 2D ~numpy.ndarray
+    u : ~numpy.ndarray
         The horizontal component of the estimated optical flow.
-    v : 2D ~numpy.ndarray
+    v : ~numpy.ndarray
         The vertical component of the estimated optical flow.
 
     """
@@ -147,9 +147,9 @@ def tvl1(I0, I1, dt=0.2, lambda_=15, tau=0.3, nwarp=5, niter=10,
 
     Parameters
     ----------
-    I0 : 2D ~numpy.ndarray
+    I0 : ~numpy.ndarray
         The first gray scale image of the sequence.
-    I1 : 2D ~numpy.ndarray
+    I1 : ~numpy.ndarray
         The second gray scale image of the sequence.
     dt : float
         Time step of the numerical scheme. Convergence is proved for
@@ -175,9 +175,9 @@ def tvl1(I0, I1, dt=0.2, lambda_=15, tau=0.3, nwarp=5, niter=10,
 
     Returns
     -------
-    u : 2D ~numpy.ndarray
+    u : ~numpy.ndarray
         The horizontal component of the estimated optical flow.
-    v : 2D ~numpy.ndarray
+    v : ~numpy.ndarray
         The vertical component of the estimated optical flow.
 
     References
@@ -217,14 +217,14 @@ def _ilk(I0, I1, u0, v0, rad, nwarp, prefilter):
 
     Parameters
     ----------
-    I0 : 2D ~numpy.ndarray
+    I0 : ~numpy.ndarray
         The first gray scale image of the sequence.
-    I1 : 2D ~numpy.ndarray
+    I1 : ~numpy.ndarray
         The second gray scale image of the sequence.
-    u0 : 2D ~numpy.ndarray
+    u0 : ~numpy.ndarray
         Initialization for the horizontal component of the vector
         field.
-    v0 : 2D ~numpy.ndarray
+    v0 : ~numpy.ndarray
         Initialization for the vertical component of the vector
         field.
     rad : int
@@ -237,9 +237,9 @@ def _ilk(I0, I1, u0, v0, rad, nwarp, prefilter):
 
     Returns
     -------
-    u : 2D ~numpy.ndarray
+    u : ~numpy.ndarray
         The horizontal component of the estimated optical flow.
-    v : 2D ~numpy.ndarray
+    v : ~numpy.ndarray
         The vertical component of the estimated optical flow.
 
     """
@@ -293,29 +293,29 @@ def ilk(I0, I1, rad=7, nwarp=10, prefilter=False):
 
     Parameters
     ----------
-    I0 : 2D ~numpy.ndarray
+    I0 : ~numpy.ndarray
         The first gray scale image of the sequence.
-    I1 : 2D ~numpy.ndarray
+    I1 : ~numpy.ndarray
         The second gray scale image of the sequence.
-    u0 : 2D ~numpy.ndarray
+    u0 : ~numpy.ndarray
         Initialization for the horizontal component of the vector
         field.
-    v0 : 2D ~numpy.ndarray
+    v0 : ~numpy.ndarray
         Initialization for the vertical component of the vector
         field.
     rad : int
-        Radius of the window considered around each pixel.
+        Radius of the window considered around each pixel (default: 7).
     nwarp : int
-        Number of times I1 is warped.
+        Number of times I1 is warped (default: 10).
     prefilter : bool
         whether to prefilter the estimated optical flow before each
-        image warp.
+        image warp (default: False).
 
     Returns
     -------
-    u : 2D ~numpy.ndarray
+    u : ~numpy.ndarray
         The horizontal component of the estimated optical flow.
-    v : 2D ~numpy.ndarray
+    v : ~numpy.ndarray
         The vertical component of the estimated optical flow.
 
     References

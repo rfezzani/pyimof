@@ -115,8 +115,8 @@ def color_wheel(u=None, v=None, nr=50, ntheta=1025):
     the color code used to display a vector field (u, v).
 
     If the vector field (u, v) is provided, the radius of the wheel is
-    equal to its maximum magnitude. Otherwise (i.e. if u and v are
-    None), the radius is set to 1.
+    equal to its maximum magnitude. Otherwise (i.e. if any of u and v
+    is None), the radius is set to 1.
 
     Parameters
     ----------
@@ -124,10 +124,12 @@ def color_wheel(u=None, v=None, nr=50, ntheta=1025):
         The horizontal component of the vector field (default: None).
     v : ~numpy.ndarray (optional)
         The vertical component of the vector field (default: None).
-    nr : int (optional)
-        The number of steps used to discretise the wheel radius.
-    ntheta : int (optional)
-        The number of steps used to discretise the wheel sectors.
+    nr : int
+        The number of steps used to discretise the wheel radius
+        (default: 50).
+    ntheta : int
+        The number of steps used to discretise the wheel sectors
+        (default:1025).
 
     Returns
     -------
@@ -138,7 +140,7 @@ def color_wheel(u=None, v=None, nr=50, ntheta=1025):
 
     """
     max_rad = 1
-    if u is not None and v is not None:
+    if u is not None or v is not None:
         max_rad = np.sqrt(u*u + v*v).max()
     radius, angle = np.mgrid[:max_rad:nr*1j, 0:2*np.pi:ntheta*1j]
     return angle, radius
@@ -185,13 +187,13 @@ def plot(u, v, ax=None, cmap='middlebury', scale=True, colorwheel=True):
     ax : ~matplotlib.pyplot.Axes (optional)
         Optional matplotlib axes used to plot the image. If None, the
         image is displayed in a tight figure (default: None).
-    cmap : str (optional)
+    cmap : str
         The colormap used to color code the input vector field
         (default: 'middlebury')
-    scale : bool (optional)
+    scale : bool
         whether to scale output saturation according to magnitude
         (default: True).
-    colorwheel : bool (optional)
+    colorwheel : bool
         whether to display the color wheel describing the images
         colors or not (default: True).
 
@@ -244,10 +246,10 @@ def quiver(u, v, c=None, bg=None, ax=None, step=None, nvec=50, bg_cmap=None,
     c : ~numpy.ndarray (optional with shape (m, n))
         Optional array of values used to color the arrows.
     bg : ~numpy.ndarray (2D or 3D optional)
-        Optional background image.
-    ax : ~matplotlib.pyplot.Axes
-        Optional matplotlib axes used to plot the image. If None, the
-        image is displayed in a tight figure (default: None).
+        Background image.
+    ax : ~matplotlib.pyplot.Axes (optional)
+        Axes used to plot the image. If None, the image is displayed
+        in a tight figure (default: None).
     step : int (optional)
         The grid step used to display the vector field. If None, it is
         computed using the nvec parameter (default: None).
@@ -259,8 +261,8 @@ def quiver(u, v, c=None, bg=None, ax=None, step=None, nvec=50, bg_cmap=None,
 
     Notes
     -----
-    Any other ``pyplot.quiver`` valid keyword can be used, knowing
-    that some are fixed
+    Any other :func:`matplotlib.pyplot.quiver` valid keyword can be
+    used, knowing that some are fixed
 
     - units = 'dots'
     - angles = 'xy'

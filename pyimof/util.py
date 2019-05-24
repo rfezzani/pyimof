@@ -13,14 +13,14 @@ def central_diff(p):
 
     Parameters
     ----------
-    p : 2D ndarray
+    p : ndarray
         The array to be processed.
 
     Returns
     -------
-    p_x : 2D ~numpy.ndarray
+    p_x : ~numpy.ndarray
         The horizontal gradient component.
-    p_y : 2D ~numpy.ndarray
+    p_y : ~numpy.ndarray
         The vertical gradient component.
 
     """
@@ -38,14 +38,14 @@ def forward_diff(p):
 
     Parameters
     ----------
-    p : 2D ~numpy.ndarray
+    p : ~numpy.ndarray
         The array to be processed.
 
     Returns
     -------
-    p_x : 2D ~numpy.ndarray
+    p_x : ~numpy.ndarray
         The horizontal gradient component.
-    p_y : 2D ~numpy.ndarray
+    p_y : ~numpy.ndarray
         The vertical gradient component.
 
     """
@@ -69,14 +69,14 @@ def div(p1, p2):
 
     Parameters
     ----------
-    p1 : 2D ~numpy.ndarray
+    p1 : ~numpy.ndarray
         The first component to be processed.
-    p2 : 2D ~numpy.ndarray
+    p2 : ~numpy.ndarray
         The second component to be processed.
 
     Returns
     -------
-    div_p : 2D ~numpy.ndarray
+    div_p : ~numpy.ndarray
         The divergence of P=(p1, p2).
 
     """
@@ -99,19 +99,19 @@ def resize_flow(u, v, shape):
 
     Parameters
     ----------
-    u : 2D ~numpy.ndarray
+    u : ~numpy.ndarray
         The horizontal component of the motion field.
-    v : 2D ~numpy.ndarray
+    v : ~numpy.ndarray
         The vertical component of the motion field.
     shape : Iterable
         Couple of integers representing the output shape.
 
     Returns
     -------
-    ru : 2D ~numpy.ndarray
+    ru : ~numpy.ndarray
         The resized and rescaled horizontal component of the motion
         field.
-    rv : 2D ~numpy.ndarray
+    rv : ~numpy.ndarray
         The resized and rescaled vertical component of the motion
         field.
 
@@ -135,7 +135,7 @@ def get_pyramid(I, downscale=2.0, nlevel=10, min_size=16):
 
     Parameters
     ----------
-    I : 2D or 3D ~numpy.ndarray
+    I : or 3D ~numpy.ndarray
         The image to be preprocessed.
     downscale : float
         The pyramid downscale factor (default: 2)
@@ -170,9 +170,9 @@ def coarse_to_fine(I0, I1, solver, downscale=2, nlevel=10, min_size=16):
 
     Parameters
     ----------
-    I0 : 2D ~numpy.ndarray
+    I0 : ~numpy.ndarray
         The first gray scale image of the sequence.
-    I1 : 2D ~numpy.ndarray
+    I1 : ~numpy.ndarray
         The second gray scale image of the sequence.
     solver : callable
         The solver applyed at each pyramid level.
@@ -186,9 +186,9 @@ def coarse_to_fine(I0, I1, solver, downscale=2, nlevel=10, min_size=16):
 
     Returns
     -------
-    u : 2D ~numpy.ndarray
+    u : ~numpy.ndarray
         the horizontal component of the estimated optical flow.
-    v : 2D ~numpy.ndarray
+    v : ~numpy.ndarray
         the vertical component of the estimated optical flow.
 
     """
