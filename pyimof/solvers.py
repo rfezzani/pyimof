@@ -50,10 +50,9 @@ def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
 
     Returns
     -------
-    u : ~numpy.ndarray
-        The horizontal component of the estimated optical flow.
-    v : ~numpy.ndarray
-        The vertical component of the estimated optical flow.
+    u, v : tuple[~numpy.ndarray]
+        The horizontal and vertical components of the estimated
+        optical flow.
 
     """
 
@@ -175,10 +174,9 @@ def tvl1(I0, I1, dt=0.2, lambda_=15, tau=0.3, nwarp=5, niter=10,
 
     Returns
     -------
-    u : ~numpy.ndarray
-        The horizontal component of the estimated optical flow.
-    v : ~numpy.ndarray
-        The vertical component of the estimated optical flow.
+    u, v : tuple[~numpy.ndarray]
+        The horizontal and vertical components of the estimated
+        optical flow.
 
     References
     ----------
@@ -237,10 +235,9 @@ def _ilk(I0, I1, u0, v0, rad, nwarp, prefilter):
 
     Returns
     -------
-    u : ~numpy.ndarray
-        The horizontal component of the estimated optical flow.
-    v : ~numpy.ndarray
-        The vertical component of the estimated optical flow.
+    u, v : tuple[~numpy.ndarray]
+        The horizontal and vertical components of the estimated
+        optical flow.
 
     """
 
@@ -313,10 +310,9 @@ def ilk(I0, I1, rad=7, nwarp=10, prefilter=False):
 
     Returns
     -------
-    u : ~numpy.ndarray
-        The horizontal component of the estimated optical flow.
-    v : ~numpy.ndarray
-        The vertical component of the estimated optical flow.
+    u, v : tuple[~numpy.ndarray]
+        The horizontal and vertical components of the estimated
+        optical flow.
 
     References
     ----------

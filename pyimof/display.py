@@ -133,10 +133,8 @@ def color_wheel(u=None, v=None, nr=50, ntheta=1025):
 
     Returns
     -------
-    angle : ~numpy.ndarray
-        The grid discretisation of the wheel sectors.
-    radius : ~numpy.ndarray
-        The grid discretisation of the wheel radius.
+    angle, radius: tuple[~numpy.ndarray]
+        The grid discretisation of the wheel sectors and radius.
 
     """
     max_rad = 1
@@ -157,10 +155,8 @@ def get_tight_figsize(I):
 
     Returns
     -------
-    w : float
-        The width in inch of the desired figure.
-    h : float
-        The height in inch of the desired figure.
+    w, h : tuple[float]
+        The width and height in inch of the desired figure.
 
     """
     nl, nc = I.shape[:2]
@@ -239,11 +235,11 @@ def quiver(u, v, c=None, bg=None, ax=None, step=None, nvec=50, bg_cmap=None,
 
     Parameters
     ----------
-    u : ~numpy.ndarray with shape (m, n)
+    u : ~numpy.ndarray (with shape m×n)
         The horizontal component of the vector field.
-    v : ~numpy.ndarray with shape (m, n)
+    v : ~numpy.ndarray (with shape m×n)
         The vertical component of the vector field.
-    c : ~numpy.ndarray (optional with shape (m, n))
+    c : ~numpy.ndarray (optional (with shape m×n))
         Optional array of values used to color the arrows.
     bg : ~numpy.ndarray (2D or 3D optional)
         Background image.

@@ -61,10 +61,9 @@ def floread(fname):
 
     Returns
     -------
-    u : ~numpy.ndarray
-        The horizontal component of the estimated optical flow.
-    v : ~numpy.ndarray
-        The vertical component of the estimated optical flow.
+    u, v : tuple[~numpy.ndarray]
+        The horizontal and vertical components of the estimated
+        optical flow.
 
     """
 

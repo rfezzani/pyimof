@@ -18,10 +18,8 @@ def central_diff(p):
 
     Returns
     -------
-    p_x : ~numpy.ndarray
-        The horizontal gradient component.
-    p_y : ~numpy.ndarray
-        The vertical gradient component.
+    p_x, p_y : tuple[~numpy.ndarray]
+        The horizontal and vertical gradient components.
 
     """
     p_y, p_x = np.gradient(p)
@@ -43,10 +41,8 @@ def forward_diff(p):
 
     Returns
     -------
-    p_x : ~numpy.ndarray
-        The horizontal gradient component.
-    p_y : ~numpy.ndarray
-        The vertical gradient component.
+    p_x, p_y : tuple[~numpy.ndarray]
+        The horizontal and vertical gradient components.
 
     """
     p_x = p.copy()
@@ -108,12 +104,9 @@ def resize_flow(u, v, shape):
 
     Returns
     -------
-    ru : ~numpy.ndarray
-        The resized and rescaled horizontal component of the motion
-        field.
-    rv : ~numpy.ndarray
-        The resized and rescaled vertical component of the motion
-        field.
+    ru, rv : tuple[~numpy.ndarray]
+        The resized and rescaled horizontal and vertical components of
+        the motion field.
 
     """
 
@@ -147,7 +140,7 @@ def get_pyramid(I, downscale=2.0, nlevel=10, min_size=16):
 
     Returns
     -------
-    pyramid : list
+    pyramid : list[~numpy.ndarray]
         The coarse to fine images pyramid.
 
     """
@@ -186,10 +179,9 @@ def coarse_to_fine(I0, I1, solver, downscale=2, nlevel=10, min_size=16):
 
     Returns
     -------
-    u : ~numpy.ndarray
-        the horizontal component of the estimated optical flow.
-    v : ~numpy.ndarray
-        the vertical component of the estimated optical flow.
+    u, v : tuple[~numpy.ndarray]
+        The horizontal and vertical components of the estimated
+        optical flow.
 
     """
 
