@@ -1,8 +1,8 @@
 Overview
 ========
 
-Pyimof actually only supports gray scale images in its implemented
-methods.
+   Pyimof actually only supports gray scale images in its implemented
+   methods.
 
 Implemented methods
 -------------------
@@ -48,9 +48,9 @@ Visualization
 Visualizing optical flow is made easy using the :mod:`pyimof.display` module
 
 - the :func:`pyimof.display.plot` function applies a colormap
-  (preferably circular ;-)) to the optical flow according to its
-  direction and magnitude. A color-wheel showing the color code is
-  also displayed to ease resulting image understanding.
+  (preferably circular 😉) to the optical flow according to its
+  direction and magnitude. An optional color-wheel showing the color
+  code can also be displayed to ease resulting image understanding.
 - the :func:`pyimof.display.quiver` function draws a quiver plot with
   multiple option for coloring the arrows and displaying a background
   image.

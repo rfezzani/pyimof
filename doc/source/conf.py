@@ -22,7 +22,7 @@ copyright = '2019, R. Fezzani'
 author = 'R. Fezzani'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '1.0.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -79,5 +79,4 @@ sphinx_gallery_conf = {
 
 intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
                        'numpy': ('https://docs.scipy.org/doc/numpy/', None),
-                       'matplotlib': ('https://matplotlib.org',
-                                      None)}
+                       'matplotlib': ('https://matplotlib.org', None), }
