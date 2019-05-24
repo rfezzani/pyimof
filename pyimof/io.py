@@ -1,3 +1,8 @@
+# coding: utf-8
+"""Functions to read and write '.flo' Middleburry file format.
+
+"""
+
 import os
 import warnings
 import numpy as np
@@ -7,7 +12,17 @@ TAG_STRING = 'PIEH'
 
 
 def flowrite(u, v, fname):
-    """Write a given flow to the middleburry file format .flo
+    """Write a given flow to the Middleburry file format .flo
+
+    Parameters
+    ----------
+    u : ~numpy.ndarray
+        The horizontal component of the estimated optical flow.
+    v : ~numpy.ndarray
+        The vertical component of the estimated optical flow.
+    fname: str
+        The target file name. The '.flo' extension is appended if
+        necessary.
 
     """
 
@@ -37,7 +52,19 @@ def flowrite(u, v, fname):
 
 
 def floread(fname):
-    """Read a Middleburry .flo file
+    """Read a Middleburry .flo file.
+
+    Parameters
+    ----------
+    fname: str
+        The file name.
+
+    Returns
+    -------
+    u : ~numpy.ndarray
+        The horizontal component of the estimated optical flow.
+    v : ~numpy.ndarray
+        The vertical component of the estimated optical flow.
 
     """
 
