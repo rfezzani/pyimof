@@ -34,13 +34,8 @@ def parse_requirements_file(filename):
     return requires
 
 
-INSTALL_REQUIRES = parse_requirements_file('requirements.txt')
-EXTRA_REQUIRES = parse_requirements_file('doc/requirements.txt')
-
-REQUIRES = [r.replace('>=', ' (>= ') + ')' for r in INSTALL_REQUIRES]
-REQUIRES = [r.replace('==', ' (== ') for r in REQUIRES]
-REQUIRES = [r.replace('[array]', '') for r in REQUIRES]
-
+REQUIRES = parse_requirements_file('requirements.txt')
+EXTRA_REQUIRES = {'docs': parse_requirements_file('doc/requirements.txt')}
 
 setup(
     name=DISTNAME,
@@ -71,10 +66,10 @@ setup(
         'Operating System :: Unix',
         'Operating System :: MacOS',
     ],
-    install_requires=INSTALL_REQUIRES,
-    requires=REQUIRES,
+    install_requires=REQUIRES,
     extras_require=EXTRA_REQUIRES,
     python_requires='>=3.5',
+    zip_safe=False,
     package_data={'': ["data/*/*.png"]},
     packages=find_packages(exclude=['test', 'doc'])
 )
