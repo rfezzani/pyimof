@@ -1,5 +1,5 @@
 # coding: utf-8
-"""A python package for optical flow estimation.
+"""A python package for optical flow estimation and visualization.
 
 """
 

@@ -13,7 +13,7 @@ def central_diff(p):
 
     Parameters
     ----------
-    p : ndarray
+    p : ~numpy.ndarray
         The array to be processed.
 
     Returns
@@ -99,7 +99,7 @@ def resize_flow(u, v, shape):
         The horizontal component of the motion field.
     v : ~numpy.ndarray
         The vertical component of the motion field.
-    shape : Iterable
+    shape : iterable
         Couple of integers representing the output shape.
 
     Returns
@@ -128,8 +128,8 @@ def get_pyramid(I, downscale=2.0, nlevel=10, min_size=16):
 
     Parameters
     ----------
-    I : or 3D ~numpy.ndarray
-        The image to be preprocessed.
+    I : ~numpy.ndarray
+        The image to be preprocessed (Gray scale or RGB).
     downscale : float
         The pyramid downscale factor (default: 2)
     nlevel : int
@@ -186,10 +186,10 @@ def coarse_to_fine(I0, I1, solver, downscale=2, nlevel=10, min_size=16):
     """
 
     if (I0.ndim != 2) or (I1.ndim != 2):
-        raise ValueError("Images should be grayscale.")
+        raise ValueError("Only grayscale images are supported.")
 
     if I0.shape != I1.shape:
-        raise ValueError("Images should have the same shape")
+        raise ValueError("Input images should have the same shape")
 
     pyramid = list(zip(get_pyramid(skimage.img_as_float32(I0),
                                    downscale, nlevel, min_size),

@@ -11,26 +11,6 @@ Pyimof gallery
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Demonstration of vector field quiver plot.">
-
-.. only:: html
-
-    .. figure:: /examples/images/thumb/sphx_glr_plot_quiver_thumb.png
-
-        :ref:`sphx_glr_examples_plot_quiver.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /examples/plot_quiver
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Demonstration of colormap application to a vector field.">
 
 .. only:: html
@@ -48,6 +28,26 @@ Pyimof gallery
    :hidden:
 
    /examples/plot_color_code
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Demonstration of vector field quiver plot.">
+
+.. only:: html
+
+    .. figure:: /examples/images/thumb/sphx_glr_plot_quiver_thumb.png
+
+        :ref:`sphx_glr_examples_plot_quiver.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/plot_quiver
 
 .. raw:: html
 
