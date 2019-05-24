@@ -1,3 +1,13 @@
+"""This module gives access to the two-frames gray scale training
+sequences of the Middlebury optical flow dataset [1]_.
+
+.. [1] Baker, S., Scharstein, D., Lewis, J. P., Roth, S., Black,
+       M. J., & Szeliski, R. (2011). A database and evaluation
+       methodology for optical flow. International Journal of Computer
+       Vision, 92(1), 1-31.
+
+"""
+
 from functools import partial
 import os
 import imageio
