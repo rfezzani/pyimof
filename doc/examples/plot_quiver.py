@@ -32,11 +32,13 @@ ax0.set_axis_off()
 ax0.set_title("Reference image")
 
 pyimof.display.quiver(u, v, ax=ax1)
+ax1.set_title("Raw arrows")
 
 pyimof.display.quiver(u, v, c=norm, bg=I0, ax=ax2,
                       cmap='jet', bg_cmap='gray')
+ax2.set_title("Arrows colored according to their norm over Image")
 
-pyimof.display.quiver(u, v, c=norm, bg=norm, ax=ax3,
-                      cmap='Greys', bg_cmap='viridis')
+pyimof.display.quiver(u, v, bg=norm, ax=ax3, color='r')
+ax3.set_title("Red arrows over magnitude")
 
 plt.show()
