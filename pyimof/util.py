@@ -131,12 +131,11 @@ def get_pyramid(I, downscale=2.0, nlevel=10, min_size=16):
     I : ~numpy.ndarray
         The image to be preprocessed (Gray scale or RGB).
     downscale : float
-        The pyramid downscale factor (default: 2)
+        The pyramid downscale factor.
     nlevel : int
-        The maximum number of pyramid levels (default: 10).
+        The maximum number of pyramid levels.
     min_size : int
-        The minimum size for any dimension of the pyramid levels
-        (default: 16).
+        The minimum size for any dimension of the pyramid levels.
 
     Returns
     -------
@@ -170,12 +169,11 @@ def coarse_to_fine(I0, I1, solver, downscale=2, nlevel=10, min_size=16):
     solver : callable
         The solver applyed at each pyramid level.
     downscale : float
-        The pyramid downscale factor (default: 2)
+        The pyramid downscale factor.
     nlevel : int
-        The maximum number of pyramid levels (default: 10).
+        The maximum number of pyramid levels.
     min_size : int
-        The minimum size for any dimension of the pyramid levels
-        (default: 16).
+        The minimum size for any dimension of the pyramid levels.
 
     Returns
     -------

@@ -153,24 +153,24 @@ def tvl1(I0, I1, dt=0.2, lambda_=15, tau=0.3, nwarp=5, niter=10,
     dt : float
         Time step of the numerical scheme. Convergence is proved for
         values dt < 0.125, but it can be larger for faster
-        convergence (default: 0.2).
+        convergence.
     lambda_ : float
         Attachement parameter. The smaller this parameter is,
-        the smoother is the solutions (default: 15).
+        the smoother is the solutions.
     tau : float
         Tightness parameter. It should have a small value in order to
         maintain attachement and regularization parts in
-        correspondence (default: 0.3).
+        correspondence.
     nwarp : int
-        Number of times I1 is warped (default: 5).
+        Number of times I1 is warped.
     niter : int
-        Number of fixed point iteration (default: 10).
+        Number of fixed point iteration.
     tol : float
         Tolerance used as stopping criterion based on the L² distance
-        between two consecutive values of (u, v) (default: 1e-4).
+        between two consecutive values of (u, v).
     prefilter : bool
         whether to prefilter the estimated optical flow before each
-        image warp (default: False).
+        image warp.
 
     Returns
     -------
@@ -294,19 +294,13 @@ def ilk(I0, I1, rad=7, nwarp=10, prefilter=False):
         The first gray scale image of the sequence.
     I1 : ~numpy.ndarray
         The second gray scale image of the sequence.
-    u0 : ~numpy.ndarray
-        Initialization for the horizontal component of the vector
-        field.
-    v0 : ~numpy.ndarray
-        Initialization for the vertical component of the vector
-        field.
     rad : int
-        Radius of the window considered around each pixel (default: 7).
+        Radius of the window considered around each pixel.
     nwarp : int
-        Number of times I1 is warped (default: 10).
+        Number of times I1 is warped.
     prefilter : bool
         whether to prefilter the estimated optical flow before each
-        image warp (default: False).
+        image warp.
 
     Returns
     -------

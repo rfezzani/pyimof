@@ -53,8 +53,9 @@ def flow_to_color(u, v, cmap=None, scale=True):
     magnitude.
 
     Any colormap compatible with matplotlib can be applyed but
-    circuler colormaps are recommanded: 'huv', 'twilight',
-    'twilight_shifted' and the builtin 'middlebury' colormaps.
+    circular colormaps are recommanded ( for example 'huv',
+    'twilight', 'twilight_shifted' and the builtin 'middlebury'
+    colormaps).
 
     If cmap is None, the HSV image defined using optical flow
     orientation (hue) and magnitude (saturation) is returned.
@@ -66,11 +67,9 @@ def flow_to_color(u, v, cmap=None, scale=True):
     v : ~numpy.ndarray
         The vertical component of the vector field.
     cmap : str (optional)
-        The colormap used to color code the input vector field
-        (default: None)
-    scale : bool
-        whether to scale output saturation according to magnitude
-        (default: True).
+        The colormap used to color code the input vector field.
+    scale : bool (optional)
+        whether to scale output saturation according to magnitude.
 
     Returns
     -------
@@ -124,12 +123,10 @@ def color_wheel(u=None, v=None, nr=50, ntheta=1025):
         The horizontal component of the vector field (default: None).
     v : ~numpy.ndarray (optional)
         The vertical component of the vector field (default: None).
-    nr : int
-        The number of steps used to discretise the wheel radius
-        (default: 50).
-    ntheta : int
-        The number of steps used to discretise the wheel sectors
-        (default:1025).
+    nr : int (optional)
+        The number of steps used to discretise the wheel radius.
+    ntheta : int (optional)
+        The number of steps used to discretise the wheel sectors.
 
     Returns
     -------
@@ -182,16 +179,14 @@ def plot(u, v, ax=None, cmap='middlebury', scale=True, colorwheel=True):
         The vertical component of the vector field.
     ax : ~matplotlib.pyplot.Axes (optional)
         Optional matplotlib axes used to plot the image. If None, the
-        image is displayed in a tight figure (default: None).
-    cmap : str
-        The colormap used to color code the input vector field
-        (default: 'middlebury')
-    scale : bool
-        whether to scale output saturation according to magnitude
-        (default: True).
-    colorwheel : bool
+        image is displayed in a tight figure.
+    cmap : str (optional)
+        The colormap used to color code the input vector field.
+    scale : bool (optional)
+        whether to scale output saturation according to magnitude.
+    colorwheel : bool (optional)
         whether to display the color wheel describing the images
-        colors or not (default: True).
+        colors or not.
 
     Returns
     -------
@@ -240,20 +235,20 @@ def quiver(u, v, c=None, bg=None, ax=None, step=None, nvec=50, bg_cmap=None,
     v : ~numpy.ndarray (with shape m×n)
         The vertical component of the vector field.
     c : ~numpy.ndarray (optional (with shape m×n))
-        Optional array of values used to color the arrows.
+        Values used to color the arrows.
     bg : ~numpy.ndarray (2D or 3D optional)
         Background image.
     ax : ~matplotlib.pyplot.Axes (optional)
         Axes used to plot the image. If None, the image is displayed
-        in a tight figure (default: None).
+        in a tight figure.
     step : int (optional)
         The grid step used to display the vector field. If None, it is
-        computed using the nvec parameter (default: None).
+        computed using the nvec parameter.
     nvec : int
         The maximum number of vector over all the grid dimentions. It
-        is ignored if the step parameter is not None (default: 50).
+        is ignored if the step parameter is not None.
     bg_cmap : str (optional)
-        The colormap used to color the background image (default: None).
+        The colormap used to color the background image.
 
     Notes
     -----
