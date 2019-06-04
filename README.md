@@ -8,6 +8,12 @@ and the
 [gallery](https://pyimof.readthedocs.io/en/latest/examples/index.html)
 for more details.
 
+## Installation
+
+```
+pip install pyimof
+```
+
 ## Quick Example
 
 Using Pyimov is as easy as
