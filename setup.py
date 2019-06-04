@@ -1,14 +1,16 @@
 from setuptools import setup, find_packages
 
 
-descr = """Pyimof
+descr = """
+Pyimof
+======
 
 Implementation of the popular TV-L1 algorithm and the robust iLK
 method for optical flow estimation. Pyimof is provided battery
 included: test data, IO and visualization tools are provided.
 
 Please refer to the online documentation at
-https://pyimof.rtfd.io/en/latest/
+https://pyimof.rtfd.io/en/stable/
 """
 
 DISTNAME = 'pyimof'
@@ -17,12 +19,12 @@ DESCRIPTION = 'Python package for optical flow estimation'
 LONG_DESCRIPTION = descr
 MAINTAINER = 'Riadh Fezzani'
 MAINTAINER_EMAIL = 'rfezzani@gmail.com'
-URL = 'https://pyimof.rtfd.io/en/latest/'
-LICENSE = 'GPL-3.0'
+URL = 'https://pyimof.rtfd.io/en/stable/'
+LICENSE = 'GPLv3'
 DOWNLOAD_URL = 'https://github.com/rfezzani/pyimof/archive/master.zip'
 PROJECT_URLS = {
     "Bug Tracker": 'https://github.com/rfezzani/pyimof/issues',
-    "Documentation": 'https://pyimof.rtfd.io/en/latest/',
+    "Documentation": 'https://pyimof.rtfd.io/en/stable/',
     "Source Code": 'https://github.com/rfezzani/pyimof'
 }
 
