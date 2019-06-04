@@ -3,9 +3,9 @@
 Pyimof (for **Py**thon **im**age **o**ptical **f**low) is a pure
 python package for dense [optical
 flow](https://en.wikipedia.org/wiki/Optical_flow) estimation. Please
-visit the [documentation](https://pyimof.readthedocs.io/en/latest/)
+visit the [documentation](https://pyimof.readthedocs.io/en/stable/)
 and the
-[gallery](https://pyimof.readthedocs.io/en/latest/examples/index.html)
+[gallery](https://pyimof.readthedocs.io/en/stable/examples/index.html)
 for more details.
 
 ## Installation
