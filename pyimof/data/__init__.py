@@ -11,6 +11,7 @@ sequences of the Middlebury optical flow dataset [1]_.
 from functools import partial
 import os
 import imageio
+from skimage import img_as_float32
 
 __all__ = ['beanbags',
            'dimetrodon',
@@ -31,7 +32,7 @@ _data_path = os.path.dirname(__file__)
 
 def _load_seq(seqname):
     dirname = os.path.join(_data_path, seqname)
-    return [imageio.imread(os.path.join(dirname, f))
+    return [img_as_float32(imageio.imread(os.path.join(dirname, f)))
             for f in sorted(os.listdir(dirname))]
 
 
