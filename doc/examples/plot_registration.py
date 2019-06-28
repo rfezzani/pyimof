@@ -2,7 +2,7 @@
 """Image registration
 ==================
 
-Demostration of image registration using optical flow.
+Demonstration of image registration using optical flow.
 
 By definition, the optical flow is the vector field *(u, v)* verifying
 *I1(x+u, y+v) = I0(x, y)*. It can then be used for registeration by
