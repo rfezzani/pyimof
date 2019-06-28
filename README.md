@@ -1,4 +1,6 @@
-[![PyPI version](https://badge.fury.io/py/pyimof.svg)](https://badge.fury.io/py/pyimof)[![Documentation Status](https://readthedocs.org/projects/pyimof/badge/?version=latest)](https://pyimof.readthedocs.io/en/latest/?badge=latest)[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![PyPI version](https://badge.fury.io/py/pyimof.svg)](https://badge.fury.io/py/pyimof)
+[![Documentation Status](https://readthedocs.org/projects/pyimof/badge/?version=latest)](https://pyimof.readthedocs.io/en/latest/?badge=latest)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 Pyimof (for **Py**thon **im**age **o**ptical **f**low) is a pure
 python package for dense [optical
