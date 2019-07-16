@@ -8,7 +8,7 @@ import warnings
 import numpy as np
 
 TAG_FLOAT = 202021.25  # check for this when READING the file
-TAG_STRING = 'PIEH'
+TAG_STRING = b'PIEH'
 
 
 def flowrite(u, v, fname):
