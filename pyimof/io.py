@@ -33,10 +33,6 @@ def flowrite(u, v, fname):
 
     h, w = u.shape
 
-    img = np.zeros((h, w, 2))
-    img[:, :, 0] = v
-    img[:, :, 1] = u
-
     with open(fname, 'wb') as f:
 
         # write the header
@@ -46,8 +42,8 @@ def flowrite(u, v, fname):
         # arrange into matrix form
         tmp = np.zeros((h, w*2))
 
-        tmp[:, ::2] = v
-        tmp[:, 1::2] = u
+        tmp[:, ::2] = u
+        tmp[:, 1::2] = v
         tmp.astype('float32').tofile(f)
 
 
@@ -86,7 +82,7 @@ def floread(fname):
             raise ValueError('{}: wrong shape ({}, {})'.format(fname, w, h))
 
         buf = np.fromfile(f, dtype=np.float32).reshape((h, w*2))
-        v = buf[:, ::2]
-        u = buf[:, 1::2]
+        u = buf[:, ::2]
+        v = buf[:, 1::2]
 
     return u, v
