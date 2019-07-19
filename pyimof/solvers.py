@@ -8,7 +8,7 @@ import numpy as np
 from scipy import ndimage as ndi
 from skimage.transform import warp
 
-from .util import coarse_to_fine, central_diff, forward_diff, div
+from .util import coarse_to_fine, tv_regularize
 
 
 def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
@@ -60,15 +60,14 @@ def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
     y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
 
     f0 = lambda_*tau
-    f1 = dt/tau
+    tol *= I0.size
 
     u = u0.copy()
     v = v0.copy()
 
-    pu1 = np.zeros_like(u0)
-    pu2 = np.zeros_like(u0)
-    pv1 = np.zeros_like(u0)
-    pv2 = np.zeros_like(u0)
+    pu = np.zeros((I0.ndim, ) + I0.shape)
+    pv = np.zeros_like(pu)
+    g = np.zeros_like(pu)
 
     for _ in range(nwarp):
         if prefilter:
@@ -76,7 +75,7 @@ def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
             v = ndi.filters.median_filter(v, 3)
 
         wI1 = warp(I1, np.array([y+v, x+u]), mode='nearest')
-        Ix, Iy = central_diff(wI1)
+        Iy, Ix = np.gradient(wI1)
         NI = Ix*Ix + Iy*Iy
         NI[NI == 0] = 1
 
@@ -90,8 +89,8 @@ def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
 
             idx = abs(rho) <= f0*NI
 
-            u_ = u.copy()
-            v_ = v.copy()
+            u_ = u
+            v_ = v
 
             u_[idx] -= rho[idx]*Ix[idx]/NI[idx]
             v_[idx] -= rho[idx]*Iy[idx]/NI[idx]
@@ -103,38 +102,15 @@ def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
 
             # Regularization term
 
-            for ___ in range(2):
-
-                u = u_ - tau*div(pu1, pu2)
-
-                ux, uy = forward_diff(u)
-                ux *= f1
-                uy *= f1
-                Q = 1 + np.sqrt(ux*ux + uy*uy)
-
-                pu1 += ux
-                pu1 /= Q
-                pu2 += uy
-                pu2 /= Q
-
-                v = v_ - tau*div(pv1, pv2)
-
-                vx, vy = forward_diff(v)
-                vx *= f1
-                vy *= f1
-                Q = 1 + np.sqrt(vx*vx + vy*vy)
-
-                pv1 += vx
-                pv1 /= Q
-                pv2 += vy
-                pv2 /= Q
+            u = tv_regularize(u_, tau, dt, 2, pu, g)
+            v = tv_regularize(v_, tau, dt, 2, pv, g)
 
         u0 -= u
         v0 -= v
-        if (u0*u0+v0*v0).sum()/(u.size) < tol:
+        if (u0*u0+v0*v0).sum() < tol:
             break
-        else:
-            u0, v0 = u.copy(), v.copy()
+
+        u0, v0 = u, v
 
     return u, v
 
@@ -255,7 +231,7 @@ def _ilk(I0, I1, u0, v0, rad, nwarp, prefilter):
             v = ndi.filters.median_filter(v, 3)
 
         wI1 = warp(I1, np.array([y+v, x+u]), mode='nearest')
-        Ix, Iy = central_diff(wI1)
+        Iy, Ix = np.gradient(wI1)
         It = wI1 - I0 - u*Ix - v*Iy
 
         J11 = Ix*Ix

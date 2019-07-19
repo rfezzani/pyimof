@@ -8,83 +8,71 @@ import skimage
 from skimage.transform import pyramid_reduce, resize
 
 
-def central_diff(p):
-    """Central difference scheme.
+def tv_regularize(x, tau=0.3, dt=0.2, max_iter=100, p=None, g=None):
+    """Toltal variation regularization using Chambolle algorithm [1]_.
 
     Parameters
     ----------
+    x : ~numpy.ndarray
+        The target array.
+    tau : float
+        Tightness parameter. It should have a small value in order to
+        maintain attachement and regularization parts in
+        correspondence.
+    dt : float
+        Time step of the numerical scheme. Convergence is proved for
+        values dt < 0.125, but it can be larger for faster
+        convergence.
+    max_iter : int
+        Maximum number of iteration.
     p : ~numpy.ndarray
-        The array to be processed.
+        Optional buffer array of shape (x.ndim, ) + x.shape.
+    g : ~numpy.ndarray
+        Optional buffer array of shape (x.ndim, ) + x.shape.
 
-    Returns
-    -------
-    p_x, p_y : tuple[~numpy.ndarray]
-        The horizontal and vertical gradient components.
-
-    """
-    p_y, p_x = np.gradient(p)
-    p_x[:, 0] = 0
-    p_x[:, -1] = 0
-    p_y[0, :] = 0
-    p_y[-1, :] = 0
-
-    return p_x, p_y
-
-
-def forward_diff(p):
-    """Forward difference scheme
-
-    Parameters
+    References
     ----------
-    p : ~numpy.ndarray
-        The array to be processed.
-
-    Returns
-    -------
-    p_x, p_y : tuple[~numpy.ndarray]
-        The horizontal and vertical gradient components.
+    .. [1] A. Chambolle, An algorithm for total variation minimization and
+           applications, Journal of Mathematical Imaging and Vision,
+           Springer, 2004, 20, 89-97.
 
     """
-    p_x = p.copy()
-    p_x[:, 1:] -= p[:, :-1]
-    p_x[:, 0] = 0
-    p_x[:, -1] = 0
+    if p is None:
+        p = np.zeros((x.ndim, ) + x.shape)
+    if g is None:
+        g = np.zeros_like(p)
+    f = dt / tau
+    out = x
 
-    p_y = p.copy()
-    p_y[1:, :] -= p[:-1, :]
-    p_y[0, :] = 0
-    p_y[-1, :] = 0
+    s_g = [slice(None), ] * (x.ndim + 1)
+    s_d = [slice(None), ] * x.ndim
+    s_p = [slice(None), ] * (x.ndim + 1)
 
-    return p_x, p_y
+    for _ in range(max_iter):
+        for ax in range(x.ndim):
+            s_g[0] = ax
+            s_g[ax+1] = slice(0, -1)
+            g[tuple(s_g)] = np.diff(out, axis=ax)
+            s_g[ax+1] = slice(None)
 
+        norm = np.sqrt((g ** 2).sum(axis=0))[np.newaxis, ...]
+        norm *= f
+        norm += 1.
+        p -= dt * g
+        p /= norm
 
-def div(p1, p2):
-    """Divergence of P=(p1, p2) using backward differece scheme:
+        # d will be the (negative) divergence of p
+        d = -p.sum(0)
+        for ax in range(x.ndim):
+            s_d[ax] = slice(1, None)
+            s_p[ax+1] = slice(0, -1)
+            s_p[0] = ax
+            d[tuple(s_d)] += p[tuple(s_p)]
+            s_d[ax] = slice(None)
+            s_p[ax+1] = slice(None)
 
-    div(P) = p1_x + p2_y
-
-    Parameters
-    ----------
-    p1 : ~numpy.ndarray
-        The first component to be processed.
-    p2 : ~numpy.ndarray
-        The second component to be processed.
-
-    Returns
-    -------
-    div_p : ~numpy.ndarray
-        The divergence of P=(p1, p2).
-
-    """
-    p1_x = p1.copy()
-    p1_x[:, :-1] -= p1[:, 1:]
-
-    p2_y = p2.copy()
-    p2_y[:-1, :] -= p2[1:, :]
-
-    div_p = p1_x + p2_y
-
-    return div_p
+        out = x + d
+    return out
 
 
 def resize_flow(u, v, shape):
