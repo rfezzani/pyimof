@@ -75,6 +75,38 @@ def tv_regularize(x, tau=0.3, dt=0.2, max_iter=100, p=None, g=None):
     return out
 
 
+def census_transform(img):
+    """Computes the census transform of an image.
+
+    Parameters
+    ----------
+    img : ~numpy.ndarray
+        The image to be processed.
+
+    Returns
+    -------
+    out : ~numpy.ndarray
+        The census transformed image.
+
+    """
+    h, w = img.shape
+    out = np.zeros((h, w), dtype=np.uint8)
+    arr = np.empty((h+2, w+2), dtype=img.dtype)
+    arr[1:-1, 1:-1] = img
+    arr[0, :] = arr[1, :]
+    arr[-1, :] = arr[-2, :]
+    arr[:, 0] = arr[:, 1]
+    arr[:, -1] = arr[:, -2]
+    offsets = [(u, v) for v in range(3) for u in range(3) if not u == 1 == v]
+
+    for u, v in offsets:
+        s_v = slice(v, v+h)
+        s_h = slice(u, u+w)
+        out = (out << 1) | (arr[s_v, s_h] >= arr[1:-1, 1:-1])
+
+    return out
+
+
 def resize_flow(u, v, shape):
     """Rescale the values of the vector field (u, v) to the desired shape.
 
@@ -135,17 +167,19 @@ def get_pyramid(I, downscale=2.0, nlevel=10, min_size=16):
     pyramid = [I]
     size = min(I.shape)
     count = 1
+    J = I
 
     while (count < nlevel) and (size > min_size):
-        J = pyramid_reduce(pyramid[-1], downscale, multichannel=False)
-        pyramid.append(J)
+        J = pyramid_reduce(J, downscale, multichannel=False)
+        pyramid.append(skimage.img_as_float32(census_transform(J)))
         size = min(J.shape)
         count += 1
 
     return pyramid[::-1]
 
 
-def coarse_to_fine(I0, I1, solver, downscale=2, nlevel=10, min_size=16):
+def coarse_to_fine(I0, I1, solver, downscale=2, nlevel=10,
+                   min_size=16, census=True):
     """Generic coarse to fine solver.
 
     Parameters
@@ -177,10 +211,12 @@ def coarse_to_fine(I0, I1, solver, downscale=2, nlevel=10, min_size=16):
     if I0.shape != I1.shape:
         raise ValueError("Input images should have the same shape")
 
-    pyramid = list(zip(get_pyramid(skimage.img_as_float32(I0),
-                                   downscale, nlevel, min_size),
-                       get_pyramid(skimage.img_as_float32(I1),
-                                   downscale, nlevel, min_size)))
+    # pyramid = list(zip(get_pyramid(skimage.img_as_float32(I0),
+    #                                downscale, nlevel, min_size),
+    #                    get_pyramid(skimage.img_as_float32(I1),
+    #                                downscale, nlevel, min_size)))
+    pyramid = list(zip(get_pyramid(I0, downscale, nlevel, min_size),
+                       get_pyramid(I1, downscale, nlevel, min_size)))
 
     u = np.zeros_like(pyramid[0][0])
     v = np.zeros_like(u)
