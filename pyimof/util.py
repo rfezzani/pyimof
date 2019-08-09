@@ -8,6 +8,29 @@ import skimage
 from skimage.transform import pyramid_reduce, resize
 
 
+def central_diff(p):
+    """Central difference scheme.
+
+    Parameters
+    ----------
+    p : ~numpy.ndarray
+        The array to be processed.
+
+    Returns
+    -------
+    p_x, p_y : tuple[~numpy.ndarray]
+        The horizontal and vertical gradient components.
+
+    """
+    p_y, p_x = np.gradient(p)
+    p_x[:, 0] = 0
+    p_x[:, -1] = 0
+    p_y[0, :] = 0
+    p_y[-1, :] = 0
+
+    return p_x, p_y
+
+
 def tv_regularize(x, tau=0.3, dt=0.2, max_iter=100, p=None, g=None):
     """Toltal variation regularization using Chambolle algorithm [1]_.
 
@@ -91,12 +114,8 @@ def census_transform(img):
     """
     h, w = img.shape
     out = np.zeros((h, w), dtype=np.uint8)
-    arr = np.empty((h+2, w+2), dtype=img.dtype)
+    arr = np.zeros((h+2, w+2), dtype=img.dtype)
     arr[1:-1, 1:-1] = img
-    arr[0, :] = arr[1, :]
-    arr[-1, :] = arr[-2, :]
-    arr[:, 0] = arr[:, 1]
-    arr[:, -1] = arr[:, -2]
     offsets = [(u, v) for v in range(3) for u in range(3) if not u == 1 == v]
 
     for u, v in offsets:
@@ -104,7 +123,7 @@ def census_transform(img):
         s_h = slice(u, u+w)
         out = (out << 1) | (arr[s_v, s_h] >= arr[1:-1, 1:-1])
 
-    return out
+    return out.astype(np.float32)/255
 
 
 def resize_flow(u, v, shape):
@@ -143,7 +162,7 @@ def resize_flow(u, v, shape):
     return ru, rv
 
 
-def get_pyramid(I, downscale=2.0, nlevel=10, min_size=16):
+def get_pyramid(I, downscale=2.0, nlevel=10, min_size=16, census=False):
     """Construct image pyramid.
 
     Parameters
@@ -156,6 +175,8 @@ def get_pyramid(I, downscale=2.0, nlevel=10, min_size=16):
         The maximum number of pyramid levels.
     min_size : int
         The minimum size for any dimension of the pyramid levels.
+    census : bool
+        Wether to apply census transform or not.
 
     Returns
     -------
@@ -164,14 +185,20 @@ def get_pyramid(I, downscale=2.0, nlevel=10, min_size=16):
 
     """
 
-    pyramid = [I]
+    if census:
+        pyramid = [census_transform(I)]
+    else:
+        pyramid = [I]
     size = min(I.shape)
     count = 1
     J = I
 
     while (count < nlevel) and (size > min_size):
         J = pyramid_reduce(J, downscale, multichannel=False)
-        pyramid.append(skimage.img_as_float32(census_transform(J)))
+        if census:
+            pyramid.append(census_transform(J))
+        else:
+            pyramid.append(J)
         size = min(J.shape)
         count += 1
 
@@ -179,7 +206,7 @@ def get_pyramid(I, downscale=2.0, nlevel=10, min_size=16):
 
 
 def coarse_to_fine(I0, I1, solver, downscale=2, nlevel=10,
-                   min_size=16, census=True):
+                   min_size=16, census=False):
     """Generic coarse to fine solver.
 
     Parameters
@@ -196,6 +223,8 @@ def coarse_to_fine(I0, I1, solver, downscale=2, nlevel=10,
         The maximum number of pyramid levels.
     min_size : int
         The minimum size for any dimension of the pyramid levels.
+    census : bool
+        Wether to apply census transform or not.
 
     Returns
     -------
@@ -211,12 +240,10 @@ def coarse_to_fine(I0, I1, solver, downscale=2, nlevel=10,
     if I0.shape != I1.shape:
         raise ValueError("Input images should have the same shape")
 
-    # pyramid = list(zip(get_pyramid(skimage.img_as_float32(I0),
-    #                                downscale, nlevel, min_size),
-    #                    get_pyramid(skimage.img_as_float32(I1),
-    #                                downscale, nlevel, min_size)))
-    pyramid = list(zip(get_pyramid(I0, downscale, nlevel, min_size),
-                       get_pyramid(I1, downscale, nlevel, min_size)))
+    pyramid = list(zip(get_pyramid(skimage.img_as_float32(I0),
+                                   downscale, nlevel, min_size, census),
+                       get_pyramid(skimage.img_as_float32(I1),
+                                   downscale, nlevel, min_size, census)))
 
     u = np.zeros_like(pyramid[0][0])
     v = np.zeros_like(u)
