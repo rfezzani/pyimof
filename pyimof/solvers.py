@@ -186,7 +186,7 @@ def tvl1(I0, I1, dt=0.2, lambda_=15, tau=0.3, nwarp=5, niter=10,
     return coarse_to_fine(I0, I1, solver)
 
 
-def _ilk(I0, I1, u0, v0, rad, nwarp, prefilter):
+def _ilk(I0, I1, u0, v0, rad, nwarp, gaussian, prefilter):
     """Iterative Lucas-Kanade (iLK) solver for optical flow estimation.
 
     Parameters
@@ -205,6 +205,9 @@ def _ilk(I0, I1, u0, v0, rad, nwarp, prefilter):
         Radius of the window considered around each pixel.
     nwarp : int
         Number of times I1 is warped.
+    gaussian : bool
+        if True, gaussian kernel is used otherwise uniform kernel is
+        used.
     prefilter : bool
         whether to prefilter the estimated optical flow before each
         image warp.
@@ -221,6 +224,11 @@ def _ilk(I0, I1, u0, v0, rad, nwarp, prefilter):
     y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
 
     size = 2*rad+1
+
+    if gaussian:
+        filter_func = partial(ndi.gaussian_filter, sigma=size/4, mode='mirror')
+    else:
+        filter_func = partial(ndi.uniform_filter, size=size, mode='mirror')
 
     u = u0.copy()
     v = v0.copy()
@@ -240,11 +248,11 @@ def _ilk(I0, I1, u0, v0, rad, nwarp, prefilter):
         J13 = Ix*It
         J23 = Iy*It
 
-        ndi.uniform_filter(J11, size=size, output=J11, mode='mirror')
-        ndi.uniform_filter(J12, size=size, output=J12, mode='mirror')
-        ndi.uniform_filter(J22, size=size, output=J22, mode='mirror')
-        ndi.uniform_filter(J13, size=size, output=J13, mode='mirror')
-        ndi.uniform_filter(J23, size=size, output=J23, mode='mirror')
+        filter_func(J11, output=J11)
+        filter_func(J12, output=J12)
+        filter_func(J22, output=J22)
+        filter_func(J13, output=J13)
+        filter_func(J23, output=J23)
 
         detA = -(J11*J22 - J12*J12)
         idx = abs(detA) < 1e-14
@@ -259,7 +267,7 @@ def _ilk(I0, I1, u0, v0, rad, nwarp, prefilter):
     return u, v
 
 
-def ilk(I0, I1, rad=7, nwarp=10, prefilter=False):
+def ilk(I0, I1, rad=7, nwarp=10, gaussian=True, prefilter=False):
     """Coarse to fine iterative Lucas-Kanade (iLK) optical flow
     estimator. A fast and robust algorithm developped by Le Besnerais
     and Champagnat [4]_ and improved in [5]_..
@@ -274,6 +282,9 @@ def ilk(I0, I1, rad=7, nwarp=10, prefilter=False):
         Radius of the window considered around each pixel.
     nwarp : int
         Number of times I1 is warped.
+    gaussian : bool
+        if True, gaussian kernel is used otherwise uniform kernel is
+        used.
     prefilter : bool
         whether to prefilter the estimated optical flow before each
         image warp.
@@ -306,6 +317,7 @@ def ilk(I0, I1, rad=7, nwarp=10, prefilter=False):
 
     """
 
-    solver = partial(_ilk, rad=rad, nwarp=nwarp, prefilter=prefilter)
+    solver = partial(_ilk, rad=rad, nwarp=nwarp, gaussian=gaussian,
+                     prefilter=prefilter)
 
     return coarse_to_fine(I0, I1, solver)

@@ -31,7 +31,7 @@ import pyimof
 
 # --- Load the Hydrangea sequence
 
-I0, I1 = pyimof.data.hydrangea()
+I0, I1 = pyimof.data.dogdance()
 
 # --- Estimate the optical flow
 
