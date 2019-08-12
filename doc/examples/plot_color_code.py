@@ -31,7 +31,7 @@ import pyimof
 
 # --- Load the Hydrangea sequence
 
-I0, I1 = pyimof.data.rubberwhale()
+I0, I1 = pyimof.data.dimetrodon()
 
 # --- Estimate the optical flow
 

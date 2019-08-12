@@ -160,8 +160,8 @@ def nd_tvl1_(I0, I1, flow0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
 
     """
 
-    nl, nc = I0.shape
-    grid = np.meshgrid(*[np.arange(n) for n in I0.shape], indexing='ij')
+    grid = np.array(
+        np.meshgrid(*[np.arange(n) for n in I0.shape], indexing='ij'))
 
     f0 = lambda_*tau
     tol *= I0.size
@@ -173,39 +173,31 @@ def nd_tvl1_(I0, I1, flow0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
 
     for _ in range(nwarp):
         if prefilter:
-            for d in flow:
-                d = ndi.filters.median_filter(d, 3)
+            flow = ndi.filters.median_filter(flow, (1, 3, 3))
 
-        wI1 = warp(I1, np.array([x+v for x, v in zip(grid, flow)]),
-                   mode='nearest')
-        grad = np.gradient(wI1)
-        NI = sum([x*x for x in grad])
+        wI1 = warp(I1, grid+flow, mode='nearest')
+        grad = np.array(np.gradient(wI1))
+        NI = (grad*grad).sum(0)
         NI[NI == 0] = 1
 
-        rho_0 = wI1 - I0
-        for gr, v in zip(grad, flow):
-            rho_0 -= gr*v
+        rho_0 = wI1 - I0 - (grad*flow).sum(0)
 
         for _ in range(niter):
 
             # Data term
 
-            rho = rho_0.copy()
-            for gr, v in zip(grad, flow):
-                rho += gr*v
+            rho = rho_0 + (grad*flow).sum(0)
 
             idx = abs(rho) <= f0*NI
 
             flow_ = flow
 
-            for gr, v in zip(grad, flow_):
-                v[idx] -= rho[idx]*gr[idx]/NI[idx]
+            flow_[:, idx] -= rho[idx]*grad[:, idx]/NI[idx]
 
             idx = ~idx
             srho = f0*np.sign(rho[idx])
 
-            for gr, v in zip(grad, flow_):
-                v[idx] -= srho*gr[idx]
+            flow_[:, idx] -= srho*grad[:, idx]
 
             # Regularization term
 
