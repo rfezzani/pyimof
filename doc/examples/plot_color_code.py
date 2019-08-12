@@ -31,11 +31,11 @@ import pyimof
 
 # --- Load the Hydrangea sequence
 
-I0, I1 = pyimof.data.dogdance()
+I0, I1 = pyimof.data.rubberwhale()
 
 # --- Estimate the optical flow
 
-u, v = pyimof.solvers.ilk(I0, I1)
+v, u = tuple(pyimof.solvers.tvl1(I0, I1))
 
 # --- Display it with different colormaps
 

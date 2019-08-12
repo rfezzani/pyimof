@@ -115,6 +115,112 @@ def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
     return u, v
 
 
+def nd_tvl1_(I0, I1, flow0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
+    """TV-L1 solver for optical flow estimation.
+
+    Parameters
+    ----------
+    I0 : ~numpy.ndarray
+        The first gray scale image of the sequence.
+    I1 : ~numpy.ndarray
+        The second gray scale image of the sequence.
+    u0 : ~numpy.ndarray
+        Initialization for the horizontal component of the vector
+        field.
+    v0 : ~numpy.ndarray
+        Initialization for the vertical component of the vector
+        field.
+    dt : float
+        Time step of the numerical scheme. Convergence is proved for
+        values dt < 0.125, but it can be larger for faster
+        convergence.
+    lambda_ : float
+        Attachement parameter. The smaller this parameter is,
+        the smoother is the solutions.
+    tau : float
+        Tightness parameter. It should have a small value in order to
+        maintain attachement and regularization parts in
+        correspondence.
+    nwarp : int
+        Number of times I1 is warped.
+    niter : int
+        Number of fixed point iteration.
+    tol : float
+        Tolerance used as stopping criterion based on the L² distance
+        between two consecutive values of (u, v).
+    prefilter : bool
+        whether to prefilter the estimated optical flow before each
+        image warp.
+
+    Returns
+    -------
+    u, v : tuple[~numpy.ndarray]
+        The horizontal and vertical components of the estimated
+        optical flow.
+
+    """
+
+    nl, nc = I0.shape
+    grid = np.meshgrid(*[np.arange(n) for n in I0.shape], indexing='ij')
+
+    f0 = lambda_*tau
+    tol *= I0.size
+
+    flow = flow0.copy()
+
+    g = np.zeros((I0.ndim, ) + I0.shape)
+    proj = [np.zeros_like(g) for _ in range(I0.ndim)]
+
+    for _ in range(nwarp):
+        if prefilter:
+            for d in flow:
+                d = ndi.filters.median_filter(d, 3)
+
+        wI1 = warp(I1, np.array([x+v for x, v in zip(grid, flow)]),
+                   mode='nearest')
+        grad = np.gradient(wI1)
+        NI = sum([x*x for x in grad])
+        NI[NI == 0] = 1
+
+        rho_0 = wI1 - I0
+        for gr, v in zip(grad, flow):
+            rho_0 -= gr*v
+
+        for _ in range(niter):
+
+            # Data term
+
+            rho = rho_0.copy()
+            for gr, v in zip(grad, flow):
+                rho += gr*v
+
+            idx = abs(rho) <= f0*NI
+
+            flow_ = flow
+
+            for gr, v in zip(grad, flow_):
+                v[idx] -= rho[idx]*gr[idx]/NI[idx]
+
+            idx = ~idx
+            srho = f0*np.sign(rho[idx])
+
+            for gr, v in zip(grad, flow_):
+                v[idx] -= srho*gr[idx]
+
+            # Regularization term
+
+            flow = np.array([tv_regularize(v, tau, dt, 2, p, g)
+                             for p, v in zip(proj, flow_)])
+
+        flow0 -= flow
+        if (flow0*flow0).sum() < tol:
+            break
+
+        flow0 = flow
+
+    return flow
+
+
 def tvl1(I0, I1, dt=0.2, lambda_=15, tau=0.3, nwarp=5, niter=10,
          tol=1e-4, prefilter=False):
     """Coarse to fine TV-L1 optical flow estimator. A popular algorithm
@@ -179,7 +285,7 @@ def tvl1(I0, I1, dt=0.2, lambda_=15, tau=0.3, nwarp=5, niter=10,
 
     """
 
-    solver = partial(_tvl1, dt=dt, lambda_=lambda_, tau=tau,
+    solver = partial(nd_tvl1_, dt=dt, lambda_=lambda_, tau=tau,
                      nwarp=nwarp, niter=niter, tol=tol,
                      prefilter=prefilter)
 

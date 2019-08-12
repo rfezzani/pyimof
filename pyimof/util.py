@@ -111,6 +111,38 @@ def resize_flow(u, v, shape):
     return ru, rv
 
 
+def nd_resize_flow(flow, shape):
+    """Rescale the values of the vector field (u, v) to the desired shape.
+
+    The values of the output vector field are scaled to the new
+    resolution.
+
+    Parameters
+    ----------
+    u : ~numpy.ndarray
+        The horizontal component of the motion field.
+    v : ~numpy.ndarray
+        The vertical component of the motion field.
+    shape : iterable
+        Couple of integers representing the output shape.
+
+    Returns
+    -------
+    ru, rv : tuple[~numpy.ndarray]
+        The resized and rescaled horizontal and vertical components of
+        the motion field.
+
+    """
+
+    scale = np.array([new/old for new, old in zip(shape, flow.shape[1:])])
+
+    for _ in shape:
+        scale = scale[..., np.newaxis]
+
+    return scale*resize(flow, (1,)+shape, order=0, preserve_range=True,
+                        anti_aliasing=False)
+
+
 def get_pyramid(I, downscale=2.0, nlevel=10, min_size=16):
     """Construct image pyramid.
 
@@ -182,13 +214,12 @@ def coarse_to_fine(I0, I1, solver, downscale=2, nlevel=10, min_size=16):
                        get_pyramid(skimage.img_as_float32(I1),
                                    downscale, nlevel, min_size)))
 
-    u = np.zeros_like(pyramid[0][0])
-    v = np.zeros_like(u)
+    flow = np.zeros((pyramid[0][0].ndim, ) + pyramid[0][0].shape)
 
-    u, v = solver(pyramid[0][0], pyramid[0][1], u, v)
+    flow = solver(pyramid[0][0], pyramid[0][1], flow)
 
     for J0, J1 in pyramid[1:]:
-        u, v = resize_flow(u, v, J0.shape)
-        u, v = solver(J0, J1, u, v)
+        flow = nd_resize_flow(flow, J0.shape)
+        flow = solver(J0, J1, flow)
 
-    return u, v
+    return tuple(flow)
