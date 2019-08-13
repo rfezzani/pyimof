@@ -8,10 +8,10 @@ import numpy as np
 from scipy import ndimage as ndi
 from skimage.transform import warp
 
-from .util import coarse_to_fine, tv_regularize
+from .util import coarse_to_fine, flow_tv_regularize
 
 
-def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
+def _tvl1(I0, I1, flow0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
     """TV-L1 solver for optical flow estimation.
 
     Parameters
@@ -20,116 +20,8 @@ def _tvl1(I0, I1, u0, v0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
         The first gray scale image of the sequence.
     I1 : ~numpy.ndarray
         The second gray scale image of the sequence.
-    u0 : ~numpy.ndarray
-        Initialization for the horizontal component of the vector
-        field.
-    v0 : ~numpy.ndarray
-        Initialization for the vertical component of the vector
-        field.
-    dt : float
-        Time step of the numerical scheme. Convergence is proved for
-        values dt < 0.125, but it can be larger for faster
-        convergence.
-    lambda_ : float
-        Attachement parameter. The smaller this parameter is,
-        the smoother is the solutions.
-    tau : float
-        Tightness parameter. It should have a small value in order to
-        maintain attachement and regularization parts in
-        correspondence.
-    nwarp : int
-        Number of times I1 is warped.
-    niter : int
-        Number of fixed point iteration.
-    tol : float
-        Tolerance used as stopping criterion based on the L² distance
-        between two consecutive values of (u, v).
-    prefilter : bool
-        whether to prefilter the estimated optical flow before each
-        image warp.
-
-    Returns
-    -------
-    u, v : tuple[~numpy.ndarray]
-        The horizontal and vertical components of the estimated
-        optical flow.
-
-    """
-
-    nl, nc = I0.shape
-    y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
-
-    f0 = lambda_*tau
-    tol *= I0.size
-
-    u = u0.copy()
-    v = v0.copy()
-
-    pu = np.zeros((I0.ndim, ) + I0.shape)
-    pv = np.zeros_like(pu)
-    g = np.zeros_like(pu)
-
-    for _ in range(nwarp):
-        if prefilter:
-            u = ndi.filters.median_filter(u, 3)
-            v = ndi.filters.median_filter(v, 3)
-
-        wI1 = warp(I1, np.array([y+v, x+u]), mode='nearest')
-        Iy, Ix = np.gradient(wI1)
-        NI = Ix*Ix + Iy*Iy
-        NI[NI == 0] = 1
-
-        rho_0 = wI1 - I0 - u0*Ix - v0*Iy
-
-        for __ in range(niter):
-
-            # Data term
-
-            rho = rho_0 + u*Ix + v*Iy
-
-            idx = abs(rho) <= f0*NI
-
-            u_ = u
-            v_ = v
-
-            u_[idx] -= rho[idx]*Ix[idx]/NI[idx]
-            v_[idx] -= rho[idx]*Iy[idx]/NI[idx]
-
-            idx = ~idx
-            srho = f0*np.sign(rho[idx])
-            u_[idx] -= srho*Ix[idx]
-            v_[idx] -= srho*Iy[idx]
-
-            # Regularization term
-
-            u = tv_regularize(u_, tau, dt, 2, pu, g)
-            v = tv_regularize(v_, tau, dt, 2, pv, g)
-
-        u0 -= u
-        v0 -= v
-        if (u0*u0+v0*v0).sum() < tol:
-            break
-
-        u0, v0 = u, v
-
-    return u, v
-
-
-def nd_tvl1_(I0, I1, flow0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
-    """TV-L1 solver for optical flow estimation.
-
-    Parameters
-    ----------
-    I0 : ~numpy.ndarray
-        The first gray scale image of the sequence.
-    I1 : ~numpy.ndarray
-        The second gray scale image of the sequence.
-    u0 : ~numpy.ndarray
-        Initialization for the horizontal component of the vector
-        field.
-    v0 : ~numpy.ndarray
-        Initialization for the vertical component of the vector
-        field.
+    flow0 : ~numpy.ndarray
+        Initial vector field.
     dt : float
         Time step of the numerical scheme. Convergence is proved for
         values dt < 0.125, but it can be larger for faster
@@ -166,21 +58,21 @@ def nd_tvl1_(I0, I1, flow0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
     f0 = lambda_*tau
     tol *= I0.size
 
-    flow = flow0.copy()
+    flow = flow0
 
     g = np.zeros((I0.ndim, ) + I0.shape)
-    proj = [np.zeros_like(g) for _ in range(I0.ndim)]
+    proj = np.zeros((I0.ndim, I0.ndim, ) + I0.shape)
 
     for _ in range(nwarp):
         if prefilter:
-            flow = ndi.filters.median_filter(flow, (1, 3, 3))
+            flow = ndi.filters.median_filter(flow, [1]+I0.ndim*[3])
 
         wI1 = warp(I1, grid+flow, mode='nearest')
         grad = np.array(np.gradient(wI1))
         NI = (grad*grad).sum(0)
         NI[NI == 0] = 1
 
-        rho_0 = wI1 - I0 - (grad*flow).sum(0)
+        rho_0 = wI1 - I0 - (grad*flow0).sum(0)
 
         for _ in range(niter):
 
@@ -201,8 +93,7 @@ def nd_tvl1_(I0, I1, flow0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
 
             # Regularization term
 
-            flow = np.array([tv_regularize(v, tau, dt, 2, p, g)
-                             for p, v in zip(proj, flow_)])
+            flow = flow_tv_regularize(flow_, tau, dt, 2, proj, g)
 
         flow0 -= flow
         if (flow0*flow0).sum() < tol:
@@ -277,14 +168,14 @@ def tvl1(I0, I1, dt=0.2, lambda_=15, tau=0.3, nwarp=5, niter=10,
 
     """
 
-    solver = partial(nd_tvl1_, dt=dt, lambda_=lambda_, tau=tau,
+    solver = partial(_tvl1, dt=dt, lambda_=lambda_, tau=tau,
                      nwarp=nwarp, niter=niter, tol=tol,
                      prefilter=prefilter)
 
     return coarse_to_fine(I0, I1, solver)
 
 
-def _ilk(I0, I1, u0, v0, rad, nwarp, gaussian, prefilter):
+def _ilk(I0, I1, flow0, rad, nwarp, gaussian, prefilter):
     """Iterative Lucas-Kanade (iLK) solver for optical flow estimation.
 
     Parameters
@@ -328,6 +219,7 @@ def _ilk(I0, I1, u0, v0, rad, nwarp, gaussian, prefilter):
     else:
         filter_func = partial(ndi.uniform_filter, size=size, mode='mirror')
 
+    v0, u0 = flow0
     u = u0.copy()
     v = v0.copy()
 
@@ -362,7 +254,7 @@ def _ilk(I0, I1, u0, v0, rad, nwarp, gaussian, prefilter):
         u[idx] = 0
         v[idx] = 0
 
-    return u, v
+    return np.array([v, u])
 
 
 def ilk(I0, I1, rad=7, nwarp=10, gaussian=True, prefilter=False):

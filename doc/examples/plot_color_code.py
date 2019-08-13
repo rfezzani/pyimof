@@ -28,14 +28,18 @@ version ``middlebury_r`` is also provided.
 
 import matplotlib.pyplot as plt
 import pyimof
+from time import time
 
 # --- Load the Hydrangea sequence
 
-I0, I1 = pyimof.data.dimetrodon()
+I0, I1 = pyimof.data.hydrangea()
 
 # --- Estimate the optical flow
 
+t0 = time()
 v, u = tuple(pyimof.solvers.tvl1(I0, I1))
+t1 = time()
+print(t1-t0)
 
 # --- Display it with different colormaps
 
