@@ -283,4 +283,4 @@ def coarse_to_fine(I0, I1, solver, downscale=2, nlevel=10, min_size=16):
         flow = nd_resize_flow(flow, J0.shape)
         flow = solver(J0, J1, flow)
 
-    return tuple(flow)
+    return flow
