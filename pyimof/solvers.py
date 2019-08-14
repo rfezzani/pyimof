@@ -10,6 +10,9 @@ from skimage.transform import warp
 
 from .util import coarse_to_fine, flow_tv_regularize
 
+# import pylab as P
+# P.ion()
+
 
 def _tvl1(I0, I1, flow0, dt, lambda_, tau, nwarp, niter, tol, prefilter):
     """TV-L1 solver for optical flow estimation.
@@ -209,55 +212,110 @@ def _ilk(I0, I1, flow0, rad, nwarp, gaussian, prefilter):
 
     """
 
-    nl, nc = I0.shape
-    y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
+    grid = np.meshgrid(*[np.arange(n) for n in I0.shape], indexing='ij')
 
     size = 2*rad+1
 
     if gaussian:
-        filter_func = partial(ndi.gaussian_filter, sigma=size/4, mode='mirror')
+        s = size / 4
+        filter_func = partial(ndi.gaussian_filter, sigma=(0, )+I0.ndim*(s, ),
+                              mode='mirror')
     else:
-        filter_func = partial(ndi.uniform_filter, size=size, mode='mirror')
+        filter_func = partial(ndi.uniform_filter, size=(1, )+I0.ndim*(size, ),
+                              mode='mirror')
 
-    v0, u0 = flow0
-    u = u0.copy()
-    v = v0.copy()
+    flow = flow0
+    coef = np.zeros((I0.ndim*((I0.ndim+1)//2+1), )+I0.shape)
+    A = np.zeros(I0.shape+I0.ndim*(I0.ndim, ))
+    b = np.zeros(I0.shape+(I0.ndim, ))
 
     for _ in range(nwarp):
         if prefilter:
-            u = ndi.filters.median_filter(u, 3)
-            v = ndi.filters.median_filter(v, 3)
+            flow = ndi.filters.median_filter(flow, (1, ) + I0.ndim * (3, ))
 
-        wI1 = warp(I1, np.array([y+v, x+u]), mode='nearest')
-        Iy, Ix = np.gradient(wI1)
-        It = wI1 - I0 - u*Ix - v*Iy
+        wI1 = warp(I1, grid+flow, mode='nearest')
+        grad = np.array(np.gradient(wI1))
+        It = wI1 - I0 - (grad*flow).sum(0)
 
-        J11 = Ix*Ix
-        J12 = Ix*Iy
-        J22 = Iy*Iy
-        J13 = Ix*It
-        J23 = Iy*It
+        k = 0
+        for i in range(I0.ndim):
+            for j in range(i, I0.ndim):
+                coef[k] = grad[i]*grad[j]
+                k += 1
+            coef[i-I0.ndim] = grad[i]*It
 
-        filter_func(J11, output=J11)
-        filter_func(J12, output=J12)
-        filter_func(J22, output=J22)
-        filter_func(J13, output=J13)
-        filter_func(J23, output=J23)
+        filter_func(coef, output=coef)
 
-        detA = -(J11*J22 - J12*J12)
-        idx = abs(detA) < 1e-14
-        detA[idx] = 1
+        k = 0
+        for i in range(I0.ndim):
+            A[..., i, i] = coef[k]
+            b[..., i] = coef[i-I0.ndim]
+            k += 1
+            for j in range(i+1, I0.ndim):
+                A[..., i, j] = A[..., j, i] = coef[k]
+                k += 1
 
-        u = (J13*J22 - J12*J23)/detA
-        v = (J23*J11 - J12*J13)/detA
+        # idx = np.linalg.matrix_rank(A, hermitian=True) < I0.ndim
+        idx = abs(np.linalg.det(A)) < 1e-14
+        A[idx] = np.eye(I0.ndim)
+        b[idx] = 0
 
-        u[idx] = 0
-        v[idx] = 0
+        flow = np.transpose(np.linalg.solve(A, b),
+                            (I0.ndim, )+tuple(range(I0.ndim)))
 
-    return np.array([v, u])
+        # P.imshow((flow*flow).sum(0))
+        # input()
+    return flow
+
+    # nl, nc = I0.shape
+    # y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
+
+    # size = 2*rad+1
+
+    # if gaussian:
+    #     filter_func = partial(ndi.gaussian_filter, sigma=size/4, mode='mirror')
+    # else:
+    #     filter_func = partial(ndi.uniform_filter, size=size, mode='mirror')
+
+    # v0, u0 = flow0
+    # u = u0.copy()
+    # v = v0.copy()
+
+    # for _ in range(nwarp):
+    #     if prefilter:
+    #         u = ndi.filters.median_filter(u, 3)
+    #         v = ndi.filters.median_filter(v, 3)
+
+    #     wI1 = warp(I1, np.array([y+v, x+u]), mode='nearest')
+    #     Iy, Ix = np.gradient(wI1)
+    #     It = wI1 - I0 - u*Ix - v*Iy
+
+    #     J11 = Ix*Ix
+    #     J12 = Ix*Iy
+    #     J22 = Iy*Iy
+    #     J13 = Ix*It
+    #     J23 = Iy*It
+
+    #     filter_func(J11, output=J11)
+    #     filter_func(J12, output=J12)
+    #     filter_func(J22, output=J22)
+    #     filter_func(J13, output=J13)
+    #     filter_func(J23, output=J23)
+
+    #     detA = -(J11*J22 - J12*J12)
+    #     idx = abs(detA) < 1e-14
+    #     detA[idx] = 1
+
+    #     u = (J13*J22 - J12*J23)/detA
+    #     v = (J23*J11 - J12*J13)/detA
+
+    #     u[idx] = 0
+    #     v[idx] = 0
+
+    # return np.array([v, u])
 
 
-def ilk(I0, I1, rad=7, nwarp=10, gaussian=True, prefilter=False):
+def ilk(I0, I1, rad=7, nwarp=10, gaussian=False, prefilter=False):
     """Coarse to fine iterative Lucas-Kanade (iLK) optical flow
     estimator. A fast and robust algorithm developped by Le Besnerais
     and Champagnat [4]_ and improved in [5]_..

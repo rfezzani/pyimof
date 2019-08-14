@@ -37,7 +37,7 @@ I0, I1 = pyimof.data.hydrangea()
 # --- Estimate the optical flow
 
 t0 = time()
-v, u = tuple(pyimof.solvers.tvl1(I0, I1))
+v, u = tuple(pyimof.solvers.ilk(I0, I1))
 t1 = time()
 print(t1-t0)
 
