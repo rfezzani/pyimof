@@ -70,7 +70,7 @@ setup(
     ],
     install_requires=REQUIRES,
     extras_require=EXTRA_REQUIRES,
-    python_requires='>=3.5',
+    python_requires='>=3.7',
     zip_safe=False,
     package_data={'': ["data/*/*.png"]},
     packages=find_packages(exclude=['test', 'doc'])
