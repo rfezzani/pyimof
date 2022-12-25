@@ -24,7 +24,7 @@ norm = np.sqrt(u*u + v*v)
 # --- Display it with different options
 
 fig = plt.figure(figsize=((9, 7)))
-ax0, ax1, ax2, ax3 = fig.subplots(2, 2, True, True).ravel()
+ax0, ax1, ax2, ax3 = fig.subplots(2, 2, sharex=True, sharey=True).ravel()
 fig.tight_layout()
 
 ax0.imshow(I0, cmap='gray')

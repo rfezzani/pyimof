@@ -36,7 +36,7 @@ nl, nc = I0.shape
 
 y, x = np.meshgrid(np.arange(nl), np.arange(nc), indexing='ij')
 
-wI1 = warp(I1, np.array([y+v, x+u]), mode='nearest')
+wI1 = warp(I1, np.array([y+v, x+u]), mode='constant')
 
 # build an RGB image with the unregistered sequence
 seq_im = np.zeros((nl, nc, 3))
@@ -59,7 +59,7 @@ target_im[..., 2] = I0
 # --- Show the result
 
 fig = plt.figure(figsize=(15, 4))
-ax0, ax1, ax2 = fig.subplots(1, 3, True)
+ax0, ax1, ax2 = fig.subplots(1, 3)
 
 ax0.imshow(seq_im)
 ax0.set_title("Unregistered sequence")

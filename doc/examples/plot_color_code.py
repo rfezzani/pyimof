@@ -40,7 +40,7 @@ u, v = pyimof.solvers.ilk(I0, I1)
 # --- Display it with different colormaps
 
 fig = plt.figure(figsize=((9, 10)))
-ax_arr = fig.subplots(3, 2, True, True)
+ax_arr = fig.subplots(3, 2, sharex=True, sharey=True)
 fig.tight_layout()
 
 ax0, ax1 = ax_arr[0, :]
